@@ -1,0 +1,5 @@
+<resources>
+  <string name="app_name">PlaceBook</string>
+  <string name="title_activity_maps">PlaceBook</string>
+  <string name="bookmark_image">Bookmark image</string>
+</resources>

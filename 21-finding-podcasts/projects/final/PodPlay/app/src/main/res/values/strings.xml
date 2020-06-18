@@ -1,0 +1,5 @@
+<resources>
+  <string name="app_name">PodPlay</string>
+  <string name="search_hint">Enter podcast search</string>
+  <string name="search">Search</string>
+</resources>
