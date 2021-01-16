@@ -86,7 +86,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun setupPlacesClient() {
-    Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
+    Places.initialize(applicationContext, getString(R.string.google_maps_key));
     placesClient = Places.createClient(this);
   }
 
@@ -192,7 +192,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private fun createBookmarkMarkerObserver() {
     mapsViewModel.getBookmarkMarkerViews()?.observe(
-        this, Observer<List<MapsViewModel.BookmarkMarkerView>> {
+        this, {
 
           map.clear()
 
@@ -204,9 +204,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private fun displayAllBookmarks(
       bookmarks: List<MapsViewModel.BookmarkMarkerView>) {
-    for (bookmark in bookmarks) {
-      addPlaceMarker(bookmark)
-    }
+    bookmarks.forEach { addPlaceMarker(it) }
   }
 
   private fun addPlaceMarker(

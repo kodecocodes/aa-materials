@@ -83,7 +83,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun setupPlacesClient() {
-    Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
+    Places.initialize(applicationContext, getString(R.string.google_maps_key));
     placesClient = Places.createClient(this);
   }
 

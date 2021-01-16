@@ -48,6 +48,8 @@ captures/
 .idea/misc.xml
 .idea/copyright
 .idea/codeStyles
+.idea/compiler.xml
+.idea/jarRepositories.xml
 
 # Keystore files
 *.jks
