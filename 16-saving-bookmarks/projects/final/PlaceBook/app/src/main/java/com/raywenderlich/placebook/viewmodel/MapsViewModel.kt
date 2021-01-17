@@ -80,8 +80,8 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
-  private fun bookmarkToMarkerView(bookmark: Bookmark): MapsViewModel.BookmarkMarkerView {
-    return MapsViewModel.BookmarkMarkerView(
+  private fun bookmarkToMarkerView(bookmark: Bookmark): BookmarkMarkerView {
+    return BookmarkMarkerView(
         bookmark.id,
         LatLng(bookmark.latitude, bookmark.longitude))
   }
