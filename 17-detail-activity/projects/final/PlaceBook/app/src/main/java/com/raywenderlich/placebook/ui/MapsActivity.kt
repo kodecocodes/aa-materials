@@ -87,7 +87,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun setupPlacesClient() {
-    Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
+    Places.initialize(applicationContext, getString(R.string.google_maps_key));
     placesClient = Places.createClient(this);
   }
 
@@ -190,7 +190,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private fun handleInfoWindowClick(marker: Marker) {
     when (marker.tag) {
-      is MapsActivity.PlaceInfo -> {
+      is PlaceInfo -> {
         val placeInfo = (marker.tag as PlaceInfo)
         if (placeInfo.place != null) {
           GlobalScope.launch {
@@ -213,7 +213,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private fun createBookmarkMarkerObserver() {
     mapsViewModel.getBookmarkMarkerViews()?.observe(
-        this, Observer<List<MapsViewModel.BookmarkMarkerView>> {
+        this, {
 
           map.clear()
 
@@ -225,9 +225,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private fun displayAllBookmarks(
       bookmarks: List<MapsViewModel.BookmarkMarkerView>) {
-    for (bookmark in bookmarks) {
-      addPlaceMarker(bookmark)
-    }
+    bookmarks.forEach { addPlaceMarker(it) }
   }
 
   private fun addPlaceMarker(
@@ -244,7 +242,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun getCurrentLocation() {
-    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+
+    if (ActivityCompat.checkSelfPermission(this,
+            Manifest.permission.ACCESS_FINE_LOCATION) !=
         PackageManager.PERMISSION_GRANTED) {
       requestLocationPermissions()
     } else {
