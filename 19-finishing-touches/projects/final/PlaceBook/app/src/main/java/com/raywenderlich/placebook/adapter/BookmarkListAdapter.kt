@@ -31,29 +31,24 @@
 package com.raywenderlich.placebook.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.raywenderlich.placebook.R
+import com.raywenderlich.placebook.databinding.BookmarkItemBinding
 import com.raywenderlich.placebook.ui.MapsActivity
 import com.raywenderlich.placebook.viewmodel.MapsViewModel.BookmarkView
-import kotlinx.android.synthetic.main.bookmark_item.view.*
 
 class BookmarkListAdapter(
     private var bookmarkData: List<BookmarkView>?,
     private val mapsActivity: MapsActivity) :
     RecyclerView.Adapter<BookmarkListAdapter.ViewHolder>() {
 
-  class ViewHolder(v: View,
+  class ViewHolder(val binding: BookmarkItemBinding,
                    private val mapsActivity: MapsActivity) :
-      RecyclerView.ViewHolder(v) {
-    val nameTextView: TextView = v.bookmarkNameTextView
-    val categoryImageView: ImageView = v.bookmarkIcon
+      RecyclerView.ViewHolder(binding.root) {
 
     init {
-      v.setOnClickListener {
+      binding.root.setOnClickListener {
         val bookmarkView = itemView.tag as BookmarkView
         mapsActivity.moveToBookmark(bookmarkView)
       }
@@ -68,11 +63,10 @@ class BookmarkListAdapter(
 
   override fun onCreateViewHolder(
       parent: ViewGroup,
-      viewType: Int): BookmarkListAdapter.ViewHolder {
-    val vh = ViewHolder(
-        LayoutInflater.from(parent.context).inflate(
-            R.layout.bookmark_item, parent, false), mapsActivity)
-    return vh
+      viewType: Int): ViewHolder {
+    val layoutInflater = LayoutInflater.from(parent.context)
+    val binding = BookmarkItemBinding.inflate(layoutInflater, parent, false)
+    return ViewHolder(binding, mapsActivity)
   }
 
   override fun onBindViewHolder(holder: ViewHolder,
@@ -81,13 +75,12 @@ class BookmarkListAdapter(
     val bookmarkData = bookmarkData ?: return
     val bookmarkViewData = bookmarkData[position]
 
-    holder.itemView.tag = bookmarkViewData
-    holder.nameTextView.text = bookmarkViewData.name
-    bookmarkViewData.categoryResourceId?.let {
-      holder.categoryImageView.setImageResource(it)
-    }
+    holder.binding.root.tag = bookmarkViewData
+    holder.binding.bookmarkData = bookmarkViewData
+    holder.binding.bookmarkIcon.setImageResource(
+        R.drawable.ic_other)
   }
-
+  
   override fun getItemCount(): Int {
     return bookmarkData?.size ?: 0
   }

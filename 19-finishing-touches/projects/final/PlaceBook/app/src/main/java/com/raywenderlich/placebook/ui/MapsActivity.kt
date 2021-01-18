@@ -37,14 +37,14 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.location.Location
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.WindowManager
 import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.lifecycle.Observer
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
@@ -67,10 +67,8 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.raywenderlich.placebook.R
 import com.raywenderlich.placebook.adapter.BookmarkInfoWindowAdapter
 import com.raywenderlich.placebook.adapter.BookmarkListAdapter
+import com.raywenderlich.placebook.databinding.ActivityMapsBinding
 import com.raywenderlich.placebook.viewmodel.MapsViewModel
-import kotlinx.android.synthetic.main.activity_maps.*
-import kotlinx.android.synthetic.main.drawer_view_maps.*
-import kotlinx.android.synthetic.main.main_view_maps.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -82,10 +80,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   private val mapsViewModel by viewModels<MapsViewModel>()
   private lateinit var bookmarkListAdapter: BookmarkListAdapter
   private var markers = HashMap<Long, Marker>()
+  private lateinit var databinding: ActivityMapsBinding
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_maps)
+    databinding = DataBindingUtil.setContentView(this, R.layout.activity_maps)
 
     val mapFragment = supportFragmentManager
         .findFragmentById(R.id.map) as SupportMapFragment
@@ -128,14 +127,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun setupPlacesClient() {
-    Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
+    Places.initialize(applicationContext, getString(R.string.google_maps_key));
     placesClient = Places.createClient(this);
   }
 
   private fun setupToolbar() {
-    setSupportActionBar(toolbar)
+    setSupportActionBar(databinding.mainMapView.toolbar)
     val toggle = ActionBarDrawerToggle(
-        this,  drawerLayout, toolbar,
+        this, databinding.drawerLayout, databinding.mainMapView.toolbar,
         R.string.open_drawer, R.string.close_drawer)
     toggle.syncState()
   }
@@ -148,7 +147,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     map.setOnInfoWindowClickListener {
       handleInfoWindowClick(it)
     }
-    fab.setOnClickListener {
+    databinding.mainMapView.fab.setOnClickListener {
       searchAtCurrentLocation()
     }
     map.setOnMapLongClickListener { latLng ->
@@ -250,9 +249,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private fun handleInfoWindowClick(marker: Marker) {
     when (marker.tag) {
-      is MapsActivity.PlaceInfo -> {
+      is PlaceInfo -> {
         val placeInfo = (marker.tag as PlaceInfo)
-        if (placeInfo.place != null) {
+        if (placeInfo.place != null && placeInfo.image != null) {
           GlobalScope.launch {
             mapsViewModel.addBookmarkFromPlace(placeInfo.place,
                 placeInfo.image)
@@ -273,23 +272,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
  private fun createBookmarkObserver() {
     mapsViewModel.getBookmarkViews()?.observe(
-        this, Observer<List<MapsViewModel.BookmarkView>> {
+        this, {
 
-          map.clear()
-          markers.clear()
+      map.clear()
+      markers.clear()
 
-          it?.let {
-            displayAllBookmarks(it)
-            bookmarkListAdapter.setBookmarkData(it)
-          }
-        })
+      it?.let {
+        displayAllBookmarks(it)
+        bookmarkListAdapter.setBookmarkData(it)
+      }
+    })
   }
 
   private fun displayAllBookmarks(
       bookmarks: List<MapsViewModel.BookmarkView>) {
-    for (bookmark in bookmarks) {
-      addPlaceMarker(bookmark)
-    }
+    bookmarks.forEach { addPlaceMarker(it) }
   }
 
   private fun addPlaceMarker(
@@ -335,9 +332,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private fun setupNavigationDrawer() {
     val layoutManager = LinearLayoutManager(this)
-    bookmarkRecyclerView.layoutManager = layoutManager
+    databinding.drawerViewMaps.bookmarkRecyclerView.layoutManager = layoutManager
     bookmarkListAdapter = BookmarkListAdapter(null, this)
-    bookmarkRecyclerView.adapter = bookmarkListAdapter
+    databinding.drawerViewMaps.bookmarkRecyclerView.adapter = bookmarkListAdapter
   }
 
   private fun updateMapToLocation(location: Location) {
@@ -348,7 +345,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   fun moveToBookmark(bookmark: MapsViewModel.BookmarkView) {
 
-    drawerLayout.closeDrawer(drawerView)
+    databinding.drawerLayout.closeDrawer(databinding.drawerViewMaps.drawerView)
 
     val marker = markers[bookmark.id]
 
@@ -379,8 +376,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
           .build(this)
       startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
     } catch (e: GooglePlayServicesRepairableException) {
+      Log.e("MAPS", "searchAtCurrentLocation",e )
       //TODO: Handle exception
     } catch (e: GooglePlayServicesNotAvailableException) {
+      Log.e("MAPS", "searchAtCurrentLocation",e )
       //TODO: Handle exception
     }
   }
@@ -405,12 +404,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun showProgress() {
-    progressBar.visibility = ProgressBar.VISIBLE
+    databinding.mainMapView.progressBar.visibility = ProgressBar.VISIBLE
     disableUserInteraction()
   }
 
   private fun hideProgress() {
-    progressBar.visibility = ProgressBar.GONE
+    databinding.mainMapView.progressBar.visibility = ProgressBar.GONE
     enableUserInteraction()
   }
 

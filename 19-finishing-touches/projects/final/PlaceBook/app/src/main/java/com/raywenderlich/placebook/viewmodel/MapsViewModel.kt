@@ -96,9 +96,9 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
   private fun getPlaceCategory(place: Place): String {
 
     var category = "Other"
-    val placeTypes = place.types
+    val types = place.types
 
-    placeTypes?.let { placeTypes ->
+    types?.let { placeTypes ->
       if (placeTypes.size > 0) {
         val placeType = placeTypes[0]
         category = bookmarkRepo.placeTypeToCategory(placeType)
@@ -109,8 +109,8 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
   }
 
   private fun bookmarkToBookmarkView(bookmark: Bookmark):
-      MapsViewModel.BookmarkView {
-    return MapsViewModel.BookmarkView(
+      BookmarkView {
+    return BookmarkView(
         bookmark.id,
         LatLng(bookmark.latitude, bookmark.longitude),
         bookmark.name,

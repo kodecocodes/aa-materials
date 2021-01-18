@@ -33,7 +33,10 @@ package com.raywenderlich.placebook.util
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import java.io.*
 import java.text.SimpleDateFormat
@@ -61,7 +64,7 @@ object ImageUtils {
 
     val bytes = stream.toByteArray()
 
-    ImageUtils.saveBytesToFile(context, bytes, filename)
+    saveBytesToFile(context, bytes, filename)
   }
 
   private fun saveBytesToFile(context: Context, bytes:
@@ -149,4 +152,27 @@ object ImageUtils {
     }
     return inSampleSize
   }
+
+  private fun rotateImage(img: Bitmap, degree: Float): Bitmap? {
+    val matrix = Matrix()
+    matrix.postRotate(degree)
+    val rotatedImg = Bitmap.createBitmap(img, 0, 0, img.width, img.height, matrix, true)
+    img.recycle()
+    return rotatedImg
+  }
+
+  @Throws(IOException::class)
+  fun rotateImageIfRequired(context: Context, img: Bitmap, selectedImage: Uri): Bitmap {
+    val input: InputStream? = context.contentResolver.openInputStream(selectedImage)
+    val ei: ExifInterface
+    if (Build.VERSION.SDK_INT > 23) ei = ExifInterface(input) else ei = ExifInterface(selectedImage.getPath())
+    val orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+    return when (orientation) {
+      ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(img, 90.0f) ?: img
+      ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(img, 180.0f) ?: img
+      ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(img, 270.0f) ?: img
+      else -> img
+    }
+  }
+
 }

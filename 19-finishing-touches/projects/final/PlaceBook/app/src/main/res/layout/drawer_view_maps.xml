@@ -1,14 +1,14 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout>
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawerView"
     android:layout_width="240dp"
     android:layout_height="match_parent"
     android:layout_gravity="start"
-    android:orientation="vertical"
-    android:background="#ddd">
-  <LinearLayout
-      xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#ddd"
+    android:orientation="vertical">
+
+    <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="140dp"
       android:background="@color/colorAccent"
@@ -19,28 +19,32 @@
       android:paddingRight="16dp"
       android:paddingTop="10dp"
       android:theme="@style/ThemeOverlay.AppCompat.Dark">
-    <ImageView
+
+      <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
-        app:srcCompat="@mipmap/ic_launcher_round"/>
-    <TextView
+        app:srcCompat="@mipmap/ic_launcher_round" />
+
+      <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
         android:text="PlaceBook"
-        android:textAppearance=
-            "@style/TextAppearance.AppCompat.Body1"/>
-    <TextView
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+      <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="raywenderlich.com"/>
-  </LinearLayout>
-  <androidx.recyclerview.widget.RecyclerView
+        android:text="raywenderlich.com" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
       android:id="@+id/bookmarkRecyclerView"
-      android:scrollbars="vertical"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"/>
-</LinearLayout>
+      android:layout_height="match_parent"
+      android:scrollbars="vertical" />
+  </LinearLayout>
+</layout>
