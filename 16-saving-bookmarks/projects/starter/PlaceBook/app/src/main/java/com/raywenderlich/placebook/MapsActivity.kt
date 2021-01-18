@@ -34,9 +34,9 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -48,7 +48,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PointOfInterest
 import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.PhotoMetadata
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPhotoRequest
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
@@ -83,8 +82,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun setupPlacesClient() {
-    Places.initialize(applicationContext, getString(R.string.google_maps_key));
-    placesClient = Places.createClient(this);
+    Places.initialize(applicationContext, getString(R.string.google_maps_key))
+    placesClient = Places.createClient(this)
   }
 
   private fun displayPoi(pointOfInterest: PointOfInterest) {
@@ -122,7 +121,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun displayPoiGetPhotoStep(place: Place) {
-    val photoMetadata = place.getPhotoMetadatas()?.get(0)
+    val photoMetadata = place.photoMetadatas?.get(0)
     if (photoMetadata == null) {
       displayPoiDisplayStep(place, null)
       return
