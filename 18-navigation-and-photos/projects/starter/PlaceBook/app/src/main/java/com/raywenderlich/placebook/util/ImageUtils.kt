@@ -49,7 +49,7 @@ object ImageUtils {
 
     val bytes = stream.toByteArray()
 
-    ImageUtils.saveBytesToFile(context, bytes, filename)
+    saveBytesToFile(context, bytes, filename)
   }
 
   private fun saveBytesToFile(context: Context, bytes:

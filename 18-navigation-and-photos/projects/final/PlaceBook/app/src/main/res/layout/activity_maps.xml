@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  >
 <androidx.drawerlayout.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:openDrawer="start"
     >
-  <include layout="@layout/main_view_maps"/>
-  <include layout="@layout/drawer_view_maps"/>
+  <include android:id="@+id/mainMapView" layout="@layout/main_view_maps"/>
+  <include android:id="@+id/drawerViewMaps" layout="@layout/drawer_view_maps"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>
+</layout>

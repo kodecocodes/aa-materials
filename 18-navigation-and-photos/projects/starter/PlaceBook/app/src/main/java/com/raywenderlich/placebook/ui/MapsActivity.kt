@@ -87,7 +87,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun setupPlacesClient() {
-    Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
+    Places.initialize(applicationContext, getString(R.string.google_maps_key));
     placesClient = Places.createClient(this);
   }
 
@@ -190,9 +190,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private fun handleInfoWindowClick(marker: Marker) {
     when (marker.tag) {
-      is MapsActivity.PlaceInfo -> {
+      is PlaceInfo -> {
         val placeInfo = (marker.tag as PlaceInfo)
-        if (placeInfo.place != null) {
+        if (placeInfo.place != null && placeInfo.image != null) {
           GlobalScope.launch {
             mapsViewModel.addBookmarkFromPlace(placeInfo.place,
                 placeInfo.image)

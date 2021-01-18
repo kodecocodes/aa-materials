@@ -39,12 +39,13 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.raywenderlich.placebook.R
+import com.raywenderlich.placebook.databinding.ActivityBookmarkDetailsBinding
 import com.raywenderlich.placebook.util.ImageUtils
 import com.raywenderlich.placebook.viewmodel.BookmarkDetailsViewModel
-import kotlinx.android.synthetic.main.activity_bookmark_details.*
 import java.io.File
 
 class BookmarkDetailsActivity : AppCompatActivity(),
@@ -53,6 +54,7 @@ class BookmarkDetailsActivity : AppCompatActivity(),
   private val bookmarkDetailsViewModel by viewModels<BookmarkDetailsViewModel>()
   private var bookmarkDetailsView:
       BookmarkDetailsViewModel.BookmarkDetailsView? = null
+  private lateinit var databinding: ActivityBookmarkDetailsBinding
   private var photoFile: File? = null
 
   override fun onCaptureClick() {
@@ -75,7 +77,7 @@ class BookmarkDetailsActivity : AppCompatActivity(),
       val captureIntent =
           Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
-      captureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT,
+      captureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
           photoUri)
 
       val intentActivities = packageManager.queryIntentActivities(
@@ -99,15 +101,13 @@ class BookmarkDetailsActivity : AppCompatActivity(),
   override fun onCreate(savedInstanceState:
                         android.os.Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_bookmark_details)
+    databinding = DataBindingUtil.setContentView(this, R.layout.activity_bookmark_details)
     setupToolbar()
     getIntentData()
   }
 
-  override fun onCreateOptionsMenu(menu: android.view.Menu):
-      Boolean {
-    val inflater = menuInflater
-    inflater.inflate(R.menu.menu_bookmark_details, menu)
+  override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
+    menuInflater.inflate(R.menu.menu_bookmark_details, menu)
     return true
   }
 
@@ -140,13 +140,19 @@ class BookmarkDetailsActivity : AppCompatActivity(),
               Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 
           val image = getImageWithPath(photoFile.absolutePath)
-          image?.let { updateImage(it) }
+          image?.let {
+            val bitmap = ImageUtils.rotateImageIfRequired(this, it, uri)
+            updateImage(bitmap)
+          }
         }
 
         REQUEST_GALLERY_IMAGE -> if (data != null && data.data != null) {
           val imageUri = data.data as Uri
           val image = getImageWithAuthority(imageUri)
-          image?.let { updateImage(it) }
+          image?.let {
+            val bitmap = ImageUtils.rotateImageIfRequired(this, it, imageUri)
+            updateImage(bitmap)
+          }
         }
       }
     }
@@ -163,7 +169,7 @@ class BookmarkDetailsActivity : AppCompatActivity(),
 
   private fun updateImage(image: Bitmap) {
     val bookmarkView = bookmarkDetailsView ?: return
-    imageViewPlace.setImageBitmap(image)
+    databinding.imageViewPlace.setImageBitmap(image)
     bookmarkView.setImage(this, image)
   }
 
@@ -181,15 +187,15 @@ class BookmarkDetailsActivity : AppCompatActivity(),
   }
 
   private fun saveChanges() {
-    val name = editTextName.text.toString()
+    val name = databinding.editTextName.text.toString()
     if (name.isEmpty()) {
       return
     }
     bookmarkDetailsView?.let { bookmarkView ->
-      bookmarkView.name = editTextName.text.toString()
-      bookmarkView.notes = editTextNotes.text.toString()
-      bookmarkView.address = editTextAddress.text.toString()
-      bookmarkView.phone = editTextPhone.text.toString()
+      bookmarkView.name = databinding.editTextName.text.toString()
+      bookmarkView.notes = databinding.editTextNotes.text.toString()
+      bookmarkView.address = databinding.editTextAddress.text.toString()
+      bookmarkView.phone = databinding.editTextPhone.text.toString()
       bookmarkDetailsViewModel.updateBookmark(bookmarkView)
     }
     finish()
@@ -201,38 +207,28 @@ class BookmarkDetailsActivity : AppCompatActivity(),
         MapsActivity.Companion.EXTRA_BOOKMARK_ID, 0)
 
     bookmarkDetailsViewModel.getBookmark(bookmarkId)?.observe(
-        this, Observer<BookmarkDetailsViewModel.BookmarkDetailsView> {
+        this, {
 
       it?.let {
         bookmarkDetailsView = it
-        // Populate fields from bookmark
-        populateFields()
+        databinding.bookmarkDetailsView = it
         populateImageView()
       }
     })
   }
 
   private fun setupToolbar() {
-    setSupportActionBar(toolbar)
-  }
-
-  private fun populateFields() {
-    bookmarkDetailsView?.let { bookmarkView ->
-      editTextName.setText(bookmarkView.name)
-      editTextPhone.setText(bookmarkView.phone)
-      editTextNotes.setText(bookmarkView.notes)
-      editTextAddress.setText(bookmarkView.address)
-    }
+    setSupportActionBar(databinding.toolbar)
   }
 
   private fun populateImageView() {
     bookmarkDetailsView?.let { bookmarkView ->
       val placeImage = bookmarkView.getImage(this)
       placeImage?.let {
-        imageViewPlace.setImageBitmap(placeImage)
+        databinding.imageViewPlace.setImageBitmap(placeImage)
       }
     }
-    imageViewPlace.setOnClickListener {
+    databinding.imageViewPlace.setOnClickListener {
       replaceImage()
     }
   }
