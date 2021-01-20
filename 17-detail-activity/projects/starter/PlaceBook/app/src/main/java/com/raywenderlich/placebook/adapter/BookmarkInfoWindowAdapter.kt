@@ -39,8 +39,7 @@ import com.google.android.gms.maps.model.Marker
 import com.raywenderlich.placebook.R
 import com.raywenderlich.placebook.ui.MapsActivity
 
-class BookmarkInfoWindowAdapter(context: Activity) :
-    GoogleMap.InfoWindowAdapter {
+class BookmarkInfoWindowAdapter(context: Activity) : GoogleMap.InfoWindowAdapter {
   private val contents: View
 
   init {

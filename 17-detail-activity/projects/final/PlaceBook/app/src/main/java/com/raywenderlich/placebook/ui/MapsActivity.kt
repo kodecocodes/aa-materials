@@ -35,11 +35,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import androidx.activity.viewModels
-import androidx.lifecycle.Observer
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -80,15 +79,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   override fun onMapReady(googleMap: GoogleMap) {
     map = googleMap
-
     setupMapListeners()
     createBookmarkMarkerObserver()
     getCurrentLocation()
   }
 
   private fun setupPlacesClient() {
-    Places.initialize(applicationContext, getString(R.string.google_maps_key));
-    placesClient = Places.createClient(this);
+    Places.initialize(applicationContext, getString(R.string.google_maps_key))
+    placesClient = Places.createClient(this)
   }
 
   private fun setupMapListeners() {
@@ -105,17 +103,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     displayPoiGetPlaceStep(pointOfInterest)
   }
 
-  private fun displayPoiGetPlaceStep(pointOfInterest:
-                                     PointOfInterest) {
+  private fun displayPoiGetPlaceStep(pointOfInterest: PointOfInterest) {
     val placeId = pointOfInterest.placeId
-
     val placeFields = listOf(Place.Field.ID,
         Place.Field.NAME,
         Place.Field.PHONE_NUMBER,
         Place.Field.PHOTO_METADATAS,
         Place.Field.ADDRESS,
         Place.Field.LAT_LNG)
-
     val request = FetchPlaceRequest
         .builder(placeId, placeFields)
         .build()
@@ -136,7 +131,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }  
 
   private fun displayPoiGetPhotoStep(place: Place) {
-    val photoMetadata = place.getPhotoMetadatas()?.get(0)
+    val photoMetadata = place.photoMetadatas?.get(0)
     if (photoMetadata == null) {
       displayPoiDisplayStep(place, null)
       return
@@ -166,9 +161,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     marker?.showInfoWindow()
   }
   
-  override fun onRequestPermissionsResult(requestCode: Int,
-                                          permissions: Array<String>,
-                                          grantResults: IntArray) {
+  override fun onRequestPermissionsResult(
+          requestCode: Int,
+          permissions: Array<String>,
+          grantResults: IntArray
+  ) {
     if (requestCode == REQUEST_LOCATION) {
       if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         getCurrentLocation()
@@ -198,7 +195,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 placeInfo.image)
           }
         }
-        marker.remove();
+        marker.remove()
       }
       is MapsViewModel.BookmarkMarkerView -> {
         val bookmarkMarkerView = (marker.tag as
@@ -212,24 +209,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun createBookmarkMarkerObserver() {
-    mapsViewModel.getBookmarkMarkerViews()?.observe(
-        this, {
-
+    mapsViewModel.getBookmarkMarkerViews()?.observe(this, {
           map.clear()
-
           it?.let {
             displayAllBookmarks(it)
           }
         })
   }
 
-  private fun displayAllBookmarks(
-      bookmarks: List<MapsViewModel.BookmarkMarkerView>) {
+  private fun displayAllBookmarks(bookmarks: List<MapsViewModel.BookmarkMarkerView>) {
     bookmarks.forEach { addPlaceMarker(it) }
   }
 
-  private fun addPlaceMarker(
-      bookmark: MapsViewModel.BookmarkMarkerView): Marker? {
+  private fun addPlaceMarker(bookmark: MapsViewModel.BookmarkMarkerView): Marker? {
     val marker = map.addMarker(MarkerOptions()
         .position(bookmark.location)
         .title(bookmark.name)
@@ -242,14 +234,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun getCurrentLocation() {
-
     if (ActivityCompat.checkSelfPermission(this,
-            Manifest.permission.ACCESS_FINE_LOCATION) !=
-        PackageManager.PERMISSION_GRANTED) {
+            Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
       requestLocationPermissions()
     } else {
       map.isMyLocationEnabled = true
-
       fusedLocationClient.lastLocation.addOnCompleteListener {
         val location = it.result
         if (location != null) {
@@ -270,8 +259,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   companion object {
-    const val EXTRA_BOOKMARK_ID =
-        "com.raywenderlich.placebook.EXTRA_BOOKMARK_ID"
+    const val EXTRA_BOOKMARK_ID = "com.raywenderlich.placebook.EXTRA_BOOKMARK_ID"
     private const val REQUEST_LOCATION = 1
     private const val TAG = "MapsActivity"
   }

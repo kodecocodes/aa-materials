@@ -40,8 +40,7 @@ import com.raywenderlich.placebook.R
 import com.raywenderlich.placebook.ui.MapsActivity
 import com.raywenderlich.placebook.viewmodel.MapsViewModel
 
-class BookmarkInfoWindowAdapter(val context: Activity) :
-    GoogleMap.InfoWindowAdapter {
+class BookmarkInfoWindowAdapter(val context: Activity) : GoogleMap.InfoWindowAdapter {
 
   private val contents: View
 
@@ -65,14 +64,12 @@ class BookmarkInfoWindowAdapter(val context: Activity) :
 
     val imageView = contents.findViewById<ImageView>(R.id.photo)
     when (marker.tag) {
-
       is MapsActivity.PlaceInfo -> {
         imageView.setImageBitmap(
             (marker.tag as MapsActivity.PlaceInfo).image)
       }
-
       is MapsViewModel.BookmarkMarkerView -> {
-        var bookMarkview = marker.tag as
+        val bookMarkview = marker.tag as
             MapsViewModel.BookmarkMarkerView
         // Set imageView bitmap here
         imageView.setImageBitmap(bookMarkview.getImage(context))
