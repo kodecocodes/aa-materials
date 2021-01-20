@@ -37,10 +37,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import com.bumptech.glide.Glide
 import com.raywenderlich.podplay.R
+import com.raywenderlich.podplay.databinding.SearchItemBinding
+import com.raywenderlich.podplay.databinding.SearchItemBindingImpl
 import com.raywenderlich.podplay.viewmodel.SearchViewModel.PodcastSummaryViewData
-import kotlinx.android.synthetic.main.search_item.view.*
 
 class PodcastListAdapter(private var podcastSummaryViewList: List<PodcastSummaryViewData>?,
                          private val podcastListAdapterListener: PodcastListAdapterListener,
@@ -51,14 +53,14 @@ class PodcastListAdapter(private var podcastSummaryViewList: List<PodcastSummary
     fun onShowDetails(podcastSummaryViewData: PodcastSummaryViewData)
   }
 
-  inner class ViewHolder(v: View, private val podcastListAdapterListener: PodcastListAdapterListener) : RecyclerView.ViewHolder(v) {
+  inner class ViewHolder(databinding: SearchItemBinding, private val podcastListAdapterListener: PodcastListAdapterListener) : RecyclerView.ViewHolder(databinding.root) {
     var podcastSummaryViewData: PodcastSummaryViewData? = null
-    val nameTextView: TextView = v.podcastNameTextView
-    val lastUpdatedTextView: TextView = v.podcastLastUpdatedTextView
-    val podcastImageView: ImageView = v.podcastImage
+    val nameTextView: TextView = databinding.podcastNameTextView
+    val lastUpdatedTextView: TextView = databinding.podcastLastUpdatedTextView
+    val podcastImageView: ImageView = databinding.podcastImage
 
     init {
-      v.setOnClickListener {
+      databinding.searchItem.setOnClickListener {
         podcastSummaryViewData?.let {
           podcastListAdapterListener.onShowDetails(it)
         }
@@ -73,8 +75,7 @@ class PodcastListAdapter(private var podcastSummaryViewList: List<PodcastSummary
 
   override fun onCreateViewHolder(parent: ViewGroup,
                                   viewType: Int): PodcastListAdapter.ViewHolder {
-    return ViewHolder(LayoutInflater.from(parent.context)
-        .inflate(R.layout.search_item, parent, false), podcastListAdapterListener)
+    return ViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.search_item, parent, false), podcastListAdapterListener)
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {

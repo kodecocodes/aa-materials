@@ -40,27 +40,30 @@ import androidx.appcompat.widget.SearchView
 import android.view.Menu
 import android.view.View
 import androidx.activity.viewModels
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.raywenderlich.podplay.R
 import com.raywenderlich.podplay.adapter.PodcastListAdapter
 import com.raywenderlich.podplay.adapter.PodcastListAdapter.PodcastListAdapterListener
+import com.raywenderlich.podplay.databinding.ActivityPodcastBinding
 import com.raywenderlich.podplay.repository.ItunesRepo
 import com.raywenderlich.podplay.service.ItunesService
 import com.raywenderlich.podplay.viewmodel.SearchViewModel
 import com.raywenderlich.podplay.viewmodel.SearchViewModel.PodcastSummaryViewData
-
-import kotlinx.android.synthetic.main.activity_podcast.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener {
 
   private val searchViewModel by viewModels<SearchViewModel>()
   private lateinit var podcastListAdapter: PodcastListAdapter
-  
+  private lateinit var databinding: ActivityPodcastBinding
+
   private val TAG = javaClass.simpleName
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_podcast)
+    databinding = DataBindingUtil.setContentView(this, R.layout.activity_podcast)
     setupToolbar()
     setupViewModels()
     updateControls()
@@ -78,23 +81,24 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener {
     searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
     return true
   }
-  
+
   private fun performSearch(term: String) {
     showProgressBar()
-    searchViewModel.searchPodcasts(term) { results ->
+    GlobalScope.launch {
+      val results = searchViewModel.searchPodcasts(term)
       hideProgressBar()
-      toolbar.title = term
+      databinding.toolbar.title = term
       podcastListAdapter.setSearchData(results)
     }
   }
-  
+
   private fun handleIntent(intent: Intent) {
     if (Intent.ACTION_SEARCH == intent.action) {
       val query = intent.getStringExtra(SearchManager.QUERY) ?: return
       performSearch(query)
     }
   }
-  
+
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
     setIntent(intent)
@@ -102,7 +106,7 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener {
   }
 
   private fun setupToolbar() {
-    setSupportActionBar(toolbar)
+    setSupportActionBar(databinding.toolbar)
   }
 
   private fun setupViewModels() {
@@ -111,28 +115,28 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener {
   }
 
   private fun updateControls() {
-    podcastRecyclerView.setHasFixedSize(true)
+    databinding.podcastRecyclerView.setHasFixedSize(true)
 
     val layoutManager = LinearLayoutManager(this)
-    podcastRecyclerView.layoutManager = layoutManager
+    databinding.podcastRecyclerView.layoutManager = layoutManager
 
     val dividerItemDecoration = DividerItemDecoration(
-            podcastRecyclerView.context, layoutManager.orientation)
-    podcastRecyclerView.addItemDecoration(dividerItemDecoration)
+        databinding.podcastRecyclerView.context, layoutManager.orientation)
+    databinding.podcastRecyclerView.addItemDecoration(dividerItemDecoration)
 
     podcastListAdapter = PodcastListAdapter(null, this, this)
-    podcastRecyclerView.adapter = podcastListAdapter
+    databinding.podcastRecyclerView.adapter = podcastListAdapter
   }
-  
+
   override fun onShowDetails(podcastSummaryViewData: PodcastSummaryViewData) {
     // Not implemented yet
   }
-  
+
   private fun showProgressBar() {
-    progressBar.visibility = View.VISIBLE
+    databinding.progressBar.visibility = View.VISIBLE
   }
-  
+
   private fun hideProgressBar() {
-    progressBar.visibility = View.INVISIBLE
+    databinding.progressBar.visibility = View.INVISIBLE
   }
 }
