@@ -53,7 +53,6 @@ class BookmarkListAdapter(
         mapsActivity.moveToBookmark(bookmarkView)
       }
     }
-
   }
 
   fun setBookmarkData(bookmarks: List<BookmarkView>) {
@@ -80,7 +79,7 @@ class BookmarkListAdapter(
     holder.binding.bookmarkIcon.setImageResource(
         R.drawable.ic_other)
   }
-  
+
   override fun getItemCount(): Int {
     return bookmarkData?.size ?: 0
   }

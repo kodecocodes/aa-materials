@@ -76,7 +76,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    databinding = DataBindingUtil.setContentView(this, R.layout.activity_maps)
+    databinding = ActivityMapsBinding.inflate(layoutInflater)
+    setContentView(databinding.root)
 
     val mapFragment = supportFragmentManager
         .findFragmentById(R.id.map) as SupportMapFragment
@@ -118,43 +119,40 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
       handleInfoWindowClick(it)
     }
   }
-  
+
   private fun displayPoi(pointOfInterest: PointOfInterest) {
     displayPoiGetPlaceStep(pointOfInterest)
   }
 
-  private fun displayPoiGetPlaceStep(pointOfInterest:
-                                     PointOfInterest) {
+  private fun displayPoiGetPlaceStep(pointOfInterest: PointOfInterest) {
     val placeId = pointOfInterest.placeId
-
     val placeFields = listOf(Place.Field.ID,
         Place.Field.NAME,
         Place.Field.PHONE_NUMBER,
         Place.Field.PHOTO_METADATAS,
         Place.Field.ADDRESS,
         Place.Field.LAT_LNG)
-
     val request = FetchPlaceRequest
         .builder(placeId, placeFields)
         .build()
 
     placesClient.fetchPlace(request)
         .addOnSuccessListener { response ->
-      val place = response.place
-      displayPoiGetPhotoStep(place)
-    }.addOnFailureListener { exception ->
-      if (exception is ApiException) {
-        val statusCode = exception.statusCode
-        Log.e(TAG,
-            "Place not found: " +
-                exception.message + ", " +
-                "statusCode: " + statusCode)
-      }
-    }
-  }  
+          val place = response.place
+          displayPoiGetPhotoStep(place)
+        }.addOnFailureListener { exception ->
+          if (exception is ApiException) {
+            val statusCode = exception.statusCode
+            Log.e(TAG,
+                "Place not found: " +
+                    exception.message + ", " +
+                    "statusCode: " + statusCode)
+          }
+        }
+  }
 
   private fun displayPoiGetPhotoStep(place: Place) {
-    val photoMetadata = place.getPhotoMetadatas()?.get(0)
+    val photoMetadata = place.photoMetadatas?.get(0)
     if (photoMetadata == null) {
       displayPoiDisplayStep(place, null)
       return
@@ -183,10 +181,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     marker?.tag = PlaceInfo(place, photo)
     marker?.showInfoWindow()
   }
-  
-  override fun onRequestPermissionsResult(requestCode: Int,
-                                          permissions: Array<String>,
-                                          grantResults: IntArray) {
+
+  override fun onRequestPermissionsResult(
+      requestCode: Int,
+      permissions: Array<String>,
+      grantResults: IntArray
+  ) {
     if (requestCode == REQUEST_LOCATION) {
       if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         getCurrentLocation()
@@ -229,7 +229,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
   }
 
- private fun createBookmarkObserver() {
+  private fun createBookmarkObserver() {
     mapsViewModel.getBookmarkViews()?.observe(
         this, {
 
@@ -310,14 +310,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     marker?.showInfoWindow()
 
     val location = Location("")
-    location.latitude =  bookmark.location.latitude
+    location.latitude = bookmark.location.latitude
     location.longitude = bookmark.location.longitude
     updateMapToLocation(location)
   }
 
 
-
- 
   companion object {
     const val EXTRA_BOOKMARK_ID =
         "com.raywenderlich.placebook.EXTRA_BOOKMARK_ID"

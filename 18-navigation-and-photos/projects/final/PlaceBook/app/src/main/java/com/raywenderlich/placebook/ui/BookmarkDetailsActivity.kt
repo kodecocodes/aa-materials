@@ -83,8 +83,10 @@ class BookmarkDetailsActivity : AppCompatActivity(),
       val intentActivities = packageManager.queryIntentActivities(
           captureIntent, PackageManager.MATCH_DEFAULT_ONLY)
       intentActivities.map { it.activityInfo.packageName }
-          .forEach { grantUriPermission(it, photoUri,
-              Intent.FLAG_GRANT_WRITE_URI_PERMISSION) }
+          .forEach {
+            grantUriPermission(it, photoUri,
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+          }
 
       startActivityForResult(captureIntent, REQUEST_CAPTURE_IMAGE)
 
@@ -209,11 +211,9 @@ class BookmarkDetailsActivity : AppCompatActivity(),
     bookmarkDetailsViewModel.getBookmark(bookmarkId)?.observe(
         this, {
 
-      it?.let {
-        bookmarkDetailsView = it
-        databinding.bookmarkDetailsView = it
-        populateImageView()
-      }
+      bookmarkDetailsView = it
+      databinding.bookmarkDetailsView = it
+      populateImageView()
     })
   }
 

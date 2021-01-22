@@ -30,6 +30,7 @@
 
 package com.raywenderlich.placebook.ui
 
+import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -41,12 +42,10 @@ import com.raywenderlich.placebook.viewmodel.BookmarkDetailsViewModel
 class BookmarkDetailsActivity : AppCompatActivity() {
 
   private val bookmarkDetailsViewModel by viewModels<BookmarkDetailsViewModel>()
-  private var bookmarkDetailsView:
-      BookmarkDetailsViewModel.BookmarkDetailsView? = null
+  private var bookmarkDetailsView: BookmarkDetailsViewModel.BookmarkDetailsView? = null
   private lateinit var databinding: ActivityBookmarkDetailsBinding
 
-  override fun onCreate(savedInstanceState:
-                        android.os.Bundle?) {
+  override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     databinding = DataBindingUtil.setContentView(this, R.layout.activity_bookmark_details)
     setupToolbar()
@@ -84,13 +83,10 @@ class BookmarkDetailsActivity : AppCompatActivity() {
   }
 
   private fun getIntentData() {
-
     val bookmarkId = intent.getLongExtra(
         MapsActivity.Companion.EXTRA_BOOKMARK_ID, 0)
 
-    bookmarkDetailsViewModel.getBookmark(bookmarkId)?.observe(
-        this, {
-
+    bookmarkDetailsViewModel.getBookmark(bookmarkId)?.observe(this, {
       it?.let {
         bookmarkDetailsView = it
         databinding.bookmarkDetailsView = it

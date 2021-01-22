@@ -55,8 +55,7 @@ object ImageUtils {
     return File.createTempFile(filename, ".jpg", filesDir)
   }
 
-  fun saveBitmapToFile(context: Context, bitmap: Bitmap,
-                       filename: String) {
+  fun saveBitmapToFile(context: Context, bitmap: Bitmap, filename: String) {
 
     val stream = ByteArrayOutputStream()
 
@@ -67,15 +66,11 @@ object ImageUtils {
     saveBytesToFile(context, bytes, filename)
   }
 
-  private fun saveBytesToFile(context: Context, bytes:
-  ByteArray, filename: String) {
+  private fun saveBytesToFile(context: Context, bytes: ByteArray, filename: String) {
     val outputStream: FileOutputStream
 
     try {
-
-      outputStream = context.openFileOutput(filename,
-          Context.MODE_PRIVATE)
-
+      outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE)
       outputStream.write(bytes)
       outputStream.close()
     } catch (e: Exception) {
@@ -83,8 +78,7 @@ object ImageUtils {
     }
   }
 
-  fun loadBitmapFromFile(context: Context, filename: String):
-      Bitmap? {
+  fun loadBitmapFromFile(context: Context, filename: String): Bitmap? {
     val filePath = File(context.filesDir, filename).absolutePath
     return BitmapFactory.decodeFile(filePath)
   }
@@ -129,7 +123,8 @@ object ImageUtils {
               inputStream, null, options)
           inputStream.close()
           return bitmap
-        } }
+        }
+      }
       return null
     } catch (e: Exception) {
       return null
@@ -164,15 +159,17 @@ object ImageUtils {
   @Throws(IOException::class)
   fun rotateImageIfRequired(context: Context, img: Bitmap, selectedImage: Uri): Bitmap {
     val input: InputStream? = context.contentResolver.openInputStream(selectedImage)
-    val ei: ExifInterface
-    if (Build.VERSION.SDK_INT > 23) ei = ExifInterface(input) else ei = ExifInterface(selectedImage.getPath())
-    val orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-    return when (orientation) {
+    val path = selectedImage.path
+    val ei: ExifInterface = when {
+      Build.VERSION.SDK_INT > 23 && input != null -> ExifInterface(input)
+      path != null -> ExifInterface(path)
+      else -> null
+    } ?: return img
+    return when (ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
       ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(img, 90.0f) ?: img
       ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(img, 180.0f) ?: img
       ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(img, 270.0f) ?: img
       else -> img
     }
   }
-
 }
