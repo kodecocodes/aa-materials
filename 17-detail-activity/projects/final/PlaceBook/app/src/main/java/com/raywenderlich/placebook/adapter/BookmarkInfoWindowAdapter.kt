@@ -37,17 +37,13 @@ import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.raywenderlich.placebook.R
+import com.raywenderlich.placebook.databinding.ContentBookmarkInfoBinding
 import com.raywenderlich.placebook.ui.MapsActivity
 import com.raywenderlich.placebook.viewmodel.MapsViewModel
 
 class BookmarkInfoWindowAdapter(val context: Activity) : GoogleMap.InfoWindowAdapter {
 
-  private val contents: View
-
-  init {
-    contents = context.layoutInflater.inflate(
-        R.layout.content_bookmark_info, null)
-  }
+  private var binding : ContentBookmarkInfoBinding = ContentBookmarkInfoBinding.inflate(context.layoutInflater)
 
   override fun getInfoWindow(marker: Marker): View? {
     // This function is required, but can return null if
@@ -55,14 +51,12 @@ class BookmarkInfoWindowAdapter(val context: Activity) : GoogleMap.InfoWindowAda
     return null
   }
 
-  override fun getInfoContents(marker: Marker): View? {
-    val titleView = contents.findViewById<TextView>(R.id.title)
-    titleView.text = marker.title ?: ""
+  override fun getInfoContents(marker: Marker): View {
+    binding.title.text = marker.title ?: ""
 
-    val phoneView = contents.findViewById<TextView>(R.id.phone)
-    phoneView.text = marker.snippet ?: ""
+    binding.phone.text = marker.snippet ?: ""
 
-    val imageView = contents.findViewById<ImageView>(R.id.photo)
+    val imageView = binding.photo
     when (marker.tag) {
       is MapsActivity.PlaceInfo -> {
         imageView.setImageBitmap(
@@ -75,6 +69,6 @@ class BookmarkInfoWindowAdapter(val context: Activity) : GoogleMap.InfoWindowAda
         imageView.setImageBitmap(bookMarkview.getImage(context))
       }
     }
-    return contents
+    return binding.root
   }
 }
