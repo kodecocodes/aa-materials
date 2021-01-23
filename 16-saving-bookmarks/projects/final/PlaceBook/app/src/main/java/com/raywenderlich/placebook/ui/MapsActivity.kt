@@ -103,8 +103,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     displayPoiGetPlaceStep(pointOfInterest)
   }
 
-  private fun displayPoiGetPlaceStep(pointOfInterest:
-                                     PointOfInterest) {
+  private fun displayPoiGetPlaceStep(pointOfInterest: PointOfInterest) {
     val placeId = pointOfInterest.placeId
 
     val placeFields = listOf(Place.Field.ID,
@@ -163,9 +162,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     marker?.tag = PlaceInfo(place, photo)
   }
   
-  override fun onRequestPermissionsResult(requestCode: Int,
-                                          permissions: Array<String>,
-                                          grantResults: IntArray) {
+  override fun onRequestPermissionsResult(
+      requestCode: Int,
+      permissions: Array<String>,
+      grantResults: IntArray
+  ) {
     if (requestCode == REQUEST_LOCATION) {
       if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         getCurrentLocation()
@@ -201,13 +202,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         })
   }
 
-  private fun displayAllBookmarks(
-      bookmarks: List<MapsViewModel.BookmarkMarkerView>) {
+  private fun displayAllBookmarks(bookmarks: List<MapsViewModel.BookmarkMarkerView>) {
     bookmarks.forEach { addPlaceMarker(it) }
   }
 
-  private fun addPlaceMarker(
-      bookmark: MapsViewModel.BookmarkMarkerView): Marker? {
+  private fun addPlaceMarker(bookmark: MapsViewModel.BookmarkMarkerView): Marker? {
     val marker = map.addMarker(MarkerOptions()
         .position(bookmark.location)
         .icon(BitmapDescriptorFactory.defaultMarker(
@@ -220,7 +219,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
   private fun getCurrentLocation() {
-
     if (ActivityCompat.checkSelfPermission(this,
             Manifest.permission.ACCESS_FINE_LOCATION) !=
         PackageManager.PERMISSION_GRANTED) {

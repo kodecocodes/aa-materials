@@ -38,8 +38,8 @@ import com.raywenderlich.placebook.model.Bookmark
 
 class BookmarkRepo(private val context: Context) {
 
-  private var db: PlaceBookDatabase = PlaceBookDatabase.getInstance(context)
-  private var bookmarkDao: BookmarkDao = db.bookmarkDao()
+  private val db: PlaceBookDatabase = PlaceBookDatabase.getInstance(context)
+  private val bookmarkDao: BookmarkDao = db.bookmarkDao()
 
   fun addBookmark(bookmark: Bookmark): Long? {
     val newId = bookmarkDao.insertBookmark(bookmark)
