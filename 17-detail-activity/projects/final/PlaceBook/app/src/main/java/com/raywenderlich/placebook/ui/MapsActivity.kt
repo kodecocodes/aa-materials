@@ -98,7 +98,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
       handleInfoWindowClick(it)
     }
   }
-  
+
   private fun displayPoi(pointOfInterest: PointOfInterest) {
     displayPoiGetPlaceStep(pointOfInterest)
   }
@@ -117,18 +117,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     placesClient.fetchPlace(request)
         .addOnSuccessListener { response ->
-      val place = response.place
-      displayPoiGetPhotoStep(place)
-    }.addOnFailureListener { exception ->
-      if (exception is ApiException) {
-        val statusCode = exception.statusCode
-        Log.e(TAG,
-            "Place not found: " +
-                exception.message + ", " +
-                "statusCode: " + statusCode)
-      }
-    }
-  }  
+          val place = response.place
+          displayPoiGetPhotoStep(place)
+        }.addOnFailureListener { exception ->
+          if (exception is ApiException) {
+            val statusCode = exception.statusCode
+            Log.e(TAG,
+                "Place not found: " +
+                    exception.message + ", " +
+                    "statusCode: " + statusCode)
+          }
+        }
+  }
 
   private fun displayPoiGetPhotoStep(place: Place) {
     val photoMetadata = place.photoMetadatas?.get(0)
@@ -160,11 +160,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     marker?.tag = PlaceInfo(place, photo)
     marker?.showInfoWindow()
   }
-  
+
   override fun onRequestPermissionsResult(
-          requestCode: Int,
-          permissions: Array<String>,
-          grantResults: IntArray
+      requestCode: Int,
+      permissions: Array<String>,
+      grantResults: IntArray
   ) {
     if (requestCode == REQUEST_LOCATION) {
       if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -210,11 +210,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private fun createBookmarkMarkerObserver() {
     mapsViewModel.getBookmarkMarkerViews()?.observe(this, {
-          map.clear()
-          it?.let {
-            displayAllBookmarks(it)
-          }
-        })
+      map.clear()
+      it?.let {
+        displayAllBookmarks(it)
+      }
+    })
   }
 
   private fun displayAllBookmarks(bookmarks: List<MapsViewModel.BookmarkMarkerView>) {

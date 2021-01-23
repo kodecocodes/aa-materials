@@ -32,7 +32,6 @@ package com.raywenderlich.placebook.viewmodel
 
 import android.app.Application
 import android.content.Context
-import android.graphics.Bitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
@@ -44,7 +43,7 @@ import kotlinx.coroutines.launch
 
 class BookmarkDetailsViewModel(application: Application) : AndroidViewModel(application) {
 
-  private var bookmarkRepo: BookmarkRepo = BookmarkRepo(getApplication())
+  private val bookmarkRepo: BookmarkRepo = BookmarkRepo(getApplication())
   private var bookmarkDetailsView: LiveData<BookmarkDetailsView>? = null
 
   fun getBookmark(bookmarkId: Long): LiveData<BookmarkDetailsView>? {

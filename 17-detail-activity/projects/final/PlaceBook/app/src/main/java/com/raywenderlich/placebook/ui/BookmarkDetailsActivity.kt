@@ -57,14 +57,12 @@ class BookmarkDetailsActivity : AppCompatActivity() {
     return true
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    when (item.itemId) {
-      R.id.action_save -> {
-        saveChanges()
-        return true
-      }
-      else -> return super.onOptionsItemSelected(item)
+  override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+    R.id.action_save -> {
+      saveChanges()
+      true
     }
+    else -> super.onOptionsItemSelected(item)
   }
 
   private fun saveChanges() {

@@ -32,18 +32,15 @@ package com.raywenderlich.placebook.adapter
 
 import android.app.Activity
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
-import com.raywenderlich.placebook.R
 import com.raywenderlich.placebook.databinding.ContentBookmarkInfoBinding
 import com.raywenderlich.placebook.ui.MapsActivity
 import com.raywenderlich.placebook.viewmodel.MapsViewModel
 
 class BookmarkInfoWindowAdapter(val context: Activity) : GoogleMap.InfoWindowAdapter {
 
-  private var binding : ContentBookmarkInfoBinding = ContentBookmarkInfoBinding.inflate(context.layoutInflater)
+  private val binding = ContentBookmarkInfoBinding.inflate(context.layoutInflater)
 
   override fun getInfoWindow(marker: Marker): View? {
     // This function is required, but can return null if
@@ -53,7 +50,6 @@ class BookmarkInfoWindowAdapter(val context: Activity) : GoogleMap.InfoWindowAda
 
   override fun getInfoContents(marker: Marker): View {
     binding.title.text = marker.title ?: ""
-
     binding.phone.text = marker.snippet ?: ""
 
     val imageView = binding.photo
