@@ -5,9 +5,7 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:openDrawer="start"
-    >
+    tools:openDrawer="start">
   <include android:id="@+id/mainMapView" layout="@layout/main_view_maps"/>
   <include android:id="@+id/drawerViewMaps" layout="@layout/drawer_view_maps"/>
-
 </androidx.drawerlayout.widget.DrawerLayout>

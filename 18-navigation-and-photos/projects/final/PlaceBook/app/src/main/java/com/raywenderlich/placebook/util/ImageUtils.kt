@@ -47,11 +47,9 @@ object ImageUtils {
 
   @Throws(IOException::class)
   fun createUniqueImageFile(context: Context): File {
-    val timeStamp =
-        SimpleDateFormat("yyyyMMddHHmmss").format(Date())
+    val timeStamp = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
     val filename = "PlaceBook_" + timeStamp + "_"
-    val filesDir = context.getExternalFilesDir(
-        Environment.DIRECTORY_PICTURES)
+    val filesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
     return File.createTempFile(filename, ".jpg", filesDir)
   }
 
@@ -83,9 +81,7 @@ object ImageUtils {
     return BitmapFactory.decodeFile(filePath)
   }
 
-  fun decodeFileToSize(filePath: String,
-                       width: Int, height: Int): Bitmap {
-
+  fun decodeFileToSize(filePath: String, width: Int, height: Int): Bitmap {
     val options = BitmapFactory.Options()
     options.inJustDecodeBounds = true
     BitmapFactory.decodeFile(filePath, options)
@@ -98,20 +94,20 @@ object ImageUtils {
     return BitmapFactory.decodeFile(filePath, options)
   }
 
-  fun decodeUriStreamToSize(uri: Uri,
-                            width: Int, height: Int, context: Context): Bitmap? {
+  fun decodeUriStreamToSize(
+      uri: Uri,
+      width: Int,
+      height: Int,
+      context: Context
+  ): Bitmap? {
     var inputStream: InputStream? = null
     try {
       val options: BitmapFactory.Options
-
       inputStream = context.contentResolver.openInputStream(uri)
-
       if (inputStream != null) {
-
         options = BitmapFactory.Options()
         options.inJustDecodeBounds = false
         BitmapFactory.decodeStream(inputStream, null, options)
-
         inputStream.close()
         inputStream = context.contentResolver.openInputStream(uri)
         if (inputStream != null) {
@@ -134,8 +130,11 @@ object ImageUtils {
   }
 
   private fun calculateInSampleSize(
-      width: Int, height: Int,
-      reqWidth: Int, reqHeight: Int): Int {
+      width: Int,
+      height: Int,
+      reqWidth: Int,
+      reqHeight: Int
+  ): Int {
     var inSampleSize = 1
     if (height > reqHeight || width > reqWidth) {
       val halfHeight = height / 2
