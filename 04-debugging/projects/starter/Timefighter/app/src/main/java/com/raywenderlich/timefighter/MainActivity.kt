@@ -9,7 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
-  
+
   private var score = 0
 
   private lateinit var gameScoreTextView: TextView
@@ -34,20 +34,6 @@ class MainActivity : AppCompatActivity() {
     tapMeButton.setOnClickListener { incrementScore() }
 
     resetGame()
-  }
-
-
-  override fun onSaveInstanceState(outState: Bundle) {
-    super.onSaveInstanceState(outState)
-    outState.putInt(SCORE_KEY, score)
-    outState.putInt(TIME_LEFT_KEY, timeLeft)
-    countDownTimer.cancel()
-    Log.d(TAG, "onSaveInstanceState: Saving Score: $score & Time Left: $timeLeft")
-  }
-
-  override fun onDestroy() {
-    super.onDestroy()
-    Log.d(TAG, "onDestroy called.")
   }
 
   private fun incrementScore() {
