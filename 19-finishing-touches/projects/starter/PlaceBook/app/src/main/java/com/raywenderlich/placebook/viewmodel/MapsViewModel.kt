@@ -47,13 +47,10 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
 
   private val TAG = "MapsViewModel"
 
-  private var bookmarkRepo: BookmarkRepo = BookmarkRepo(
-      getApplication())
-  private var bookmarks: LiveData<List<BookmarkView>>?
-      = null
+  private var bookmarkRepo: BookmarkRepo = BookmarkRepo(getApplication())
+  private var bookmarks: LiveData<List<BookmarkView>>? = null
 
   fun addBookmarkFromPlace(place: Place, image: Bitmap?) {
-
     val bookmark = bookmarkRepo.createBookmark()
     bookmark.placeId = place.id
     bookmark.name = place.name.toString()
@@ -67,8 +64,7 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
     Log.i(TAG, "New bookmark $newId added to the database.")
   }
 
-  fun getBookmarkViews() :
-      LiveData<List<BookmarkView>>? {
+  fun getBookmarkViews(): LiveData<List<BookmarkView>>? {
     if (bookmarks == null) {
       mapBookmarksToBookmarkView()
     }
@@ -83,9 +79,8 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
-  private fun bookmarkToBookmarkView(bookmark: Bookmark):
-      MapsViewModel.BookmarkView {
-    return MapsViewModel.BookmarkView(
+  private fun bookmarkToBookmarkView(bookmark: Bookmark): BookmarkView {
+    return BookmarkView(
         bookmark.id,
         LatLng(bookmark.latitude, bookmark.longitude),
         bookmark.name,
@@ -96,13 +91,10 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
       var id: Long? = null,
       var location: LatLng = LatLng(0.0, 0.0),
       var name: String = "",
-      var phone: String = "") {
-    fun getImage(context: Context): Bitmap? {
-      id?.let {
-        return ImageUtils.loadBitmapFromFile(context,
-            Bookmark.generateImageFilename(it))
-      }
-      return null
+      var phone: String = ""
+  ) {
+    fun getImage(context: Context) = id?.let {
+      ImageUtils.loadBitmapFromFile(context, Bookmark.generateImageFilename(it))
     }
   }
 }

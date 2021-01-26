@@ -47,16 +47,13 @@ object ImageUtils {
 
   @Throws(IOException::class)
   fun createUniqueImageFile(context: Context): File {
-    val timeStamp =
-        SimpleDateFormat("yyyyMMddHHmmss").format(Date())
+    val timeStamp = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
     val filename = "PlaceBook_" + timeStamp + "_"
-    val filesDir = context.getExternalFilesDir(
-        Environment.DIRECTORY_PICTURES)
+    val filesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
     return File.createTempFile(filename, ".jpg", filesDir)
   }
 
-  fun saveBitmapToFile(context: Context, bitmap: Bitmap,
-                       filename: String) {
+  fun saveBitmapToFile(context: Context, bitmap: Bitmap, filename: String) {
 
     val stream = ByteArrayOutputStream()
 
@@ -67,15 +64,11 @@ object ImageUtils {
     saveBytesToFile(context, bytes, filename)
   }
 
-  private fun saveBytesToFile(context: Context, bytes:
-  ByteArray, filename: String) {
+  private fun saveBytesToFile(context: Context, bytes: ByteArray, filename: String) {
     val outputStream: FileOutputStream
 
     try {
-
-      outputStream = context.openFileOutput(filename,
-          Context.MODE_PRIVATE)
-
+      outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE)
       outputStream.write(bytes)
       outputStream.close()
     } catch (e: Exception) {
@@ -83,15 +76,12 @@ object ImageUtils {
     }
   }
 
-  fun loadBitmapFromFile(context: Context, filename: String):
-      Bitmap? {
+  fun loadBitmapFromFile(context: Context, filename: String): Bitmap? {
     val filePath = File(context.filesDir, filename).absolutePath
     return BitmapFactory.decodeFile(filePath)
   }
 
-  fun decodeFileToSize(filePath: String,
-                       width: Int, height: Int): Bitmap {
-
+  fun decodeFileToSize(filePath: String, width: Int, height: Int): Bitmap {
     val options = BitmapFactory.Options()
     options.inJustDecodeBounds = true
     BitmapFactory.decodeFile(filePath, options)
@@ -104,20 +94,20 @@ object ImageUtils {
     return BitmapFactory.decodeFile(filePath, options)
   }
 
-  fun decodeUriStreamToSize(uri: Uri,
-                            width: Int, height: Int, context: Context): Bitmap? {
+  fun decodeUriStreamToSize(
+      uri: Uri,
+      width: Int,
+      height: Int,
+      context: Context
+  ): Bitmap? {
     var inputStream: InputStream? = null
     try {
       val options: BitmapFactory.Options
-
       inputStream = context.contentResolver.openInputStream(uri)
-
       if (inputStream != null) {
-
         options = BitmapFactory.Options()
         options.inJustDecodeBounds = false
         BitmapFactory.decodeStream(inputStream, null, options)
-
         inputStream.close()
         inputStream = context.contentResolver.openInputStream(uri)
         if (inputStream != null) {
@@ -129,7 +119,8 @@ object ImageUtils {
               inputStream, null, options)
           inputStream.close()
           return bitmap
-        } }
+        }
+      }
       return null
     } catch (e: Exception) {
       return null
@@ -139,8 +130,11 @@ object ImageUtils {
   }
 
   private fun calculateInSampleSize(
-      width: Int, height: Int,
-      reqWidth: Int, reqHeight: Int): Int {
+      width: Int,
+      height: Int,
+      reqWidth: Int,
+      reqHeight: Int
+  ): Int {
     var inSampleSize = 1
     if (height > reqHeight || width > reqWidth) {
       val halfHeight = height / 2
@@ -164,15 +158,17 @@ object ImageUtils {
   @Throws(IOException::class)
   fun rotateImageIfRequired(context: Context, img: Bitmap, selectedImage: Uri): Bitmap {
     val input: InputStream? = context.contentResolver.openInputStream(selectedImage)
-    val ei: ExifInterface
-    if (Build.VERSION.SDK_INT > 23) ei = ExifInterface(input) else ei = ExifInterface(selectedImage.getPath())
-    val orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-    return when (orientation) {
+    val path = selectedImage.path
+    val ei: ExifInterface = when {
+      Build.VERSION.SDK_INT > 23 && input != null -> ExifInterface(input)
+      path != null -> ExifInterface(path)
+      else -> null
+    } ?: return img
+    return when (ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
       ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(img, 90.0f) ?: img
       ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(img, 180.0f) ?: img
       ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(img, 270.0f) ?: img
       else -> img
     }
   }
-
 }

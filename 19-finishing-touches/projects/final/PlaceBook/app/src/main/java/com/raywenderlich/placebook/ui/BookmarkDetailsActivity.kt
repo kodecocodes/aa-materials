@@ -34,6 +34,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Bundle
 import android.provider.MediaStore
 import android.view.MenuItem
 import android.view.View
@@ -55,44 +56,34 @@ class BookmarkDetailsActivity : AppCompatActivity(),
     PhotoOptionDialogFragment.PhotoOptionDialogListener {
 
   private val bookmarkDetailsViewModel by viewModels<BookmarkDetailsViewModel>()
-  private var bookmarkDetailsView:
-      BookmarkDetailsViewModel.BookmarkDetailsView? = null
+  private var bookmarkDetailsView: BookmarkDetailsViewModel.BookmarkDetailsView? = null
   private lateinit var databinding: ActivityBookmarkDetailsBinding
   private var photoFile: File? = null
 
   override fun onCaptureClick() {
-
     photoFile = null
     try {
-
       photoFile = ImageUtils.createUniqueImageFile(this)
-
     } catch (ex: java.io.IOException) {
       return
     }
 
     photoFile?.let { photoFile ->
-
       val photoUri = FileProvider.getUriForFile(this,
           "com.raywenderlich.placebook.fileprovider",
           photoFile)
-
       val captureIntent =
           Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-
-      captureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-          photoUri)
-
+      captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
       val intentActivities = packageManager.queryIntentActivities(
           captureIntent, PackageManager.MATCH_DEFAULT_ONLY)
       intentActivities.map { it.activityInfo.packageName }
-          .forEach { grantUriPermission(it, photoUri,
-              Intent.FLAG_GRANT_WRITE_URI_PERMISSION) }
-
+          .forEach {
+            grantUriPermission(it, photoUri,
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+          }
       startActivityForResult(captureIntent, REQUEST_CAPTURE_IMAGE)
-
     }
-
   }
 
   override fun onPickClick() {
@@ -101,8 +92,7 @@ class BookmarkDetailsActivity : AppCompatActivity(),
     startActivityForResult(pickIntent, REQUEST_GALLERY_IMAGE)
   }
 
-  override fun onCreate(savedInstanceState:
-                        android.os.Bundle?) {
+  override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     databinding = DataBindingUtil.setContentView(this, R.layout.activity_bookmark_details)
     setupToolbar()
@@ -129,8 +119,7 @@ class BookmarkDetailsActivity : AppCompatActivity(),
     }
   }
 
-  override fun onActivityResult(requestCode: Int, resultCode: Int,
-                                data: Intent?) {
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
 
     if (resultCode == android.app.Activity.RESULT_OK) {
@@ -144,9 +133,7 @@ class BookmarkDetailsActivity : AppCompatActivity(),
           val uri = FileProvider.getUriForFile(this,
               "com.raywenderlich.placebook.fileprovider",
               photoFile)
-          revokeUriPermission(uri,
-              Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-
+          revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
           val image = getImageWithPath(photoFile.absolutePath)
           image?.let {
             val bitmap = ImageUtils.rotateImageIfRequired(this, it, uri)
@@ -170,37 +157,31 @@ class BookmarkDetailsActivity : AppCompatActivity(),
 
     val bookmarkView = bookmarkDetailsView ?: return
 
-    val resourceId =
-        bookmarkDetailsViewModel.getCategoryResourceId(
-            bookmarkView.category)
+    val resourceId = bookmarkDetailsViewModel.getCategoryResourceId(bookmarkView.category)
 
     resourceId?.let { databinding.imageViewCategory.setImageResource(it) }
 
     val categories = bookmarkDetailsViewModel.getCategories()
 
-    val adapter = ArrayAdapter(this,
-        android.R.layout.simple_spinner_item, categories)
-    adapter.setDropDownViewResource(
-        android.R.layout.simple_spinner_dropdown_item)
+    val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
     databinding.spinnerCategory.adapter = adapter
 
     val placeCategory = bookmarkView.category
-    databinding.spinnerCategory.setSelection(
-        adapter.getPosition(placeCategory))
+    databinding.spinnerCategory.setSelection(adapter.getPosition(placeCategory))
 
     databinding.spinnerCategory.post {
-      databinding.spinnerCategory.onItemSelectedListener = object :
-          AdapterView.OnItemSelectedListener {
-        override fun onItemSelected(parent: AdapterView<*>, view: View,
-                                    position: Int, id: Long) {
+      databinding.spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
 
           val category = parent.getItemAtPosition(position) as String
-          val resourceId =
-              bookmarkDetailsViewModel.getCategoryResourceId(category)
+          val resourceId = bookmarkDetailsViewModel.getCategoryResourceId(category)
           resourceId?.let {
-            databinding.imageViewCategory.setImageResource(it) }
+            databinding.imageViewCategory.setImageResource(it)
+          }
         }
+
         override fun onNothingSelected(parent: AdapterView<*>) {
           // NOTE: This method is required but not used.
         }
@@ -265,7 +246,6 @@ class BookmarkDetailsActivity : AppCompatActivity(),
   }
 
   private fun getIntentData() {
-
     val bookmarkId = intent.getLongExtra(
         MapsActivity.Companion.EXTRA_BOOKMARK_ID, 0)
 
