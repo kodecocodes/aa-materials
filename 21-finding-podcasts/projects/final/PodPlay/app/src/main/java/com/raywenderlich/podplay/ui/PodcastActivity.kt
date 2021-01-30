@@ -40,7 +40,6 @@ import androidx.appcompat.widget.SearchView
 import android.view.Menu
 import android.view.View
 import androidx.activity.viewModels
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.raywenderlich.podplay.R
 import com.raywenderlich.podplay.adapter.PodcastListAdapter
@@ -50,8 +49,10 @@ import com.raywenderlich.podplay.repository.ItunesRepo
 import com.raywenderlich.podplay.service.ItunesService
 import com.raywenderlich.podplay.viewmodel.SearchViewModel
 import com.raywenderlich.podplay.viewmodel.SearchViewModel.PodcastSummaryViewData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener {
 
@@ -63,7 +64,8 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    databinding = DataBindingUtil.setContentView(this, R.layout.activity_podcast)
+    databinding = ActivityPodcastBinding.inflate(layoutInflater)
+    setContentView(databinding.root)
     setupToolbar()
     setupViewModels()
     updateControls()
@@ -86,9 +88,11 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener {
     showProgressBar()
     GlobalScope.launch {
       val results = searchViewModel.searchPodcasts(term)
-      hideProgressBar()
-      databinding.toolbar.title = term
-      podcastListAdapter.setSearchData(results)
+      withContext(Dispatchers.Main) {
+        hideProgressBar()
+        databinding.toolbar.title = term
+        podcastListAdapter.setSearchData(results)
+      }
     }
   }
 

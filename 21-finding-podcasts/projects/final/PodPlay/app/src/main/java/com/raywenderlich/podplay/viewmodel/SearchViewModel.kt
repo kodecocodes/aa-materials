@@ -59,9 +59,9 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
   suspend fun searchPodcasts(term: String): List<PodcastSummaryViewData> {
     val results = iTunesRepo?.searchByTerm(term)
 
-    if (results != null) {
+    if (results != null && results.isSuccessful) {
       val podcasts = results.body()?.results
-      if (results.isSuccessful && podcasts != null) {
+      if (!podcasts.isNullOrEmpty()) {
         return podcasts.map { podcast ->
           itunesPodcastToPodcastSummaryView(podcast)
         }
