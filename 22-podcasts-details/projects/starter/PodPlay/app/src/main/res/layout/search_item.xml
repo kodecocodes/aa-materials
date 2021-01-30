@@ -1,40 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
-  android:orientation="horizontal"
+  android:id="@+id/searchItem"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
   android:paddingTop="10dp"
   android:paddingBottom="10dp"
   android:paddingLeft="5dp"
   android:paddingRight="5dp">
+
   <ImageView
     android:id="@+id/podcastImage"
     android:layout_width="40dp"
     android:layout_height="40dp"
-    android:layout_marginEnd="5dp"
+    android:layout_marginBottom="9dp"
+    android:layout_marginStart="5dp"
     android:adjustViewBounds="true"
-    android:scaleType="fitStart"/>
-  <LinearLayout
-    android:layout_width="match_parent"
+    android:scaleType="fitStart"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
+
+
+  <TextView
+    android:id="@+id/podcastNameTextView"
+    android:layout_width="0dp"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="5dp"
-    android:orientation="vertical">
-    <TextView
-      android:id="@+id/podcastNameTextView"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_gravity="top"
-      android:layout_marginBottom="5dp"
-      android:textStyle="bold"
-      tools:text="Name"/>
-    <TextView
-      android:id="@+id/podcastLastUpdatedTextView"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_gravity="top"
-      android:textSize="12sp"
-      tools:text="Last updated"/>
-  </LinearLayout>
-</LinearLayout>
+    android:layout_gravity="top"
+    android:layout_marginEnd="8dp"
+    android:layout_marginStart="8dp"
+    android:textStyle="bold"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toEndOf="@+id/podcastImage"
+    app:layout_constraintTop_toTopOf="parent"
+    tools:text="Name" />
+
+  <TextView
+    android:id="@+id/podcastLastUpdatedTextView"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="top"
+    android:layout_marginEnd="8dp"
+    android:layout_marginStart="8dp"
+    android:textSize="12sp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toEndOf="@+id/podcastImage"
+    app:layout_constraintTop_toBottomOf="@+id/podcastNameTextView"
+    tools:text="Last updated" />
+</androidx.constraintlayout.widget.ConstraintLayout>

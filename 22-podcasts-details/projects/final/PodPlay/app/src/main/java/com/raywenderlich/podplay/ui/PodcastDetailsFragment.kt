@@ -36,12 +36,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.raywenderlich.podplay.R
+import com.raywenderlich.podplay.databinding.ActivityPodcastBinding
+import com.raywenderlich.podplay.databinding.FragmentPodcastDetailsBinding
 import com.raywenderlich.podplay.viewmodel.PodcastViewModel
-import kotlinx.android.synthetic.main.fragment_podcast_details.*
 
 class PodcastDetailsFragment : Fragment() {
 
   private val podcastViewModel: PodcastViewModel by activityViewModels()
+  private lateinit var databinding: FragmentPodcastDetailsBinding
+
 
   companion object {
     fun newInstance(): PodcastDetailsFragment {
@@ -55,8 +58,9 @@ class PodcastDetailsFragment : Fragment() {
   }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                            savedInstanceState: Bundle?): View? {
-    return inflater.inflate(R.layout.fragment_podcast_details, container, false)
+                            savedInstanceState: Bundle?): View {
+    databinding = FragmentPodcastDetailsBinding.inflate(inflater, container, false)
+    return databinding.root
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -71,10 +75,10 @@ class PodcastDetailsFragment : Fragment() {
 
   private fun updateControls() {
     val viewData = podcastViewModel.activePodcastViewData ?: return
-    feedTitleTextView.text = viewData.feedTitle
-    feedDescTextView.text = viewData.feedDesc
+    databinding.feedTitleTextView.text = viewData.feedTitle
+    databinding.feedDescTextView.text = viewData.feedDesc
     activity?.let { activity ->
-      Glide.with(activity).load(viewData.imageUrl).into(feedImageView)
+      Glide.with(activity).load(viewData.imageUrl).into(databinding.feedImageView)
     }
   }
 }
