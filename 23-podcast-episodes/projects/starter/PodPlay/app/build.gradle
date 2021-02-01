@@ -8,7 +8,7 @@ android {
   compileSdkVersion 30
   defaultConfig {
     applicationId "com.raywenderlich.podplay"
-    minSdkVersion 22
+    minSdkVersion 23
     targetSdkVersion 30
     versionCode 1
     versionName "1.0"
