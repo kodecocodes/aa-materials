@@ -31,9 +31,13 @@
 package com.raywenderlich.podplay.repository
 
 import com.raywenderlich.podplay.model.Podcast
+import com.raywenderlich.podplay.service.RssFeedService
 
 class PodcastRepo {
-  fun getPodcast(feedUrl: String): Podcast? {
-        return Podcast(feedUrl, "No Name","No description", "No image")
+  suspend fun getPodcast(feedUrl: String): Podcast? {
+    val rssFeedService = RssFeedService()
+    rssFeedService.getFeed(feedUrl)
+
+    return Podcast(feedUrl, "No Name", "No description", "No image")
   }
 }

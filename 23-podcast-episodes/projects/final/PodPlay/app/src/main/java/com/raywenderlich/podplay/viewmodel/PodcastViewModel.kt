@@ -32,10 +32,12 @@ package com.raywenderlich.podplay.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.raywenderlich.podplay.model.Episode
 import com.raywenderlich.podplay.model.Podcast
 import com.raywenderlich.podplay.repository.PodcastRepo
 import com.raywenderlich.podplay.viewmodel.SearchViewModel.PodcastSummaryViewData
+import kotlinx.coroutines.launch
 import java.util.*
 
 class PodcastViewModel(application: Application) : AndroidViewModel(application) {
@@ -48,14 +50,16 @@ class PodcastViewModel(application: Application) : AndroidViewModel(application)
     val repo = podcastRepo ?: return null
     val feedUrl = podcastSummaryViewData.feedUrl ?: return null
 
-    val podcast = repo.getPodcast(feedUrl)
-    podcast?.let {
-      it.feedTitle = podcastSummaryViewData.name ?: ""
-      it.imageUrl = podcastSummaryViewData.imageUrl ?: ""
-      activePodcastViewData = podcastToPodcastView(it)
-      return activePodcastViewData
+    viewModelScope.launch {
+      val podcast = repo.getPodcast(feedUrl)
+      podcast?.let {
+        it.feedTitle = podcastSummaryViewData.name ?: ""
+        it.imageUrl = podcastSummaryViewData.imageUrl ?: ""
+        activePodcastViewData = podcastToPodcastView(it)
+
+      }
     }
-    return null
+    return activePodcastViewData
   }
 
   private fun podcastToPodcastView(podcast: Podcast): PodcastViewData {
