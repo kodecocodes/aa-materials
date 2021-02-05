@@ -40,6 +40,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -372,10 +373,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
       startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
     } catch (e: GooglePlayServicesRepairableException) {
       Log.e("MAPS", "searchAtCurrentLocation",e )
-      //TODO: Handle exception
+      Toast.makeText(this, "Problems Searching", Toast.LENGTH_LONG).show()
     } catch (e: GooglePlayServicesNotAvailableException) {
       Log.e("MAPS", "searchAtCurrentLocation",e )
-      //TODO: Handle exception
+      Toast.makeText(this, "Problems Searching. Google Play Not available", Toast.LENGTH_LONG).show()
     }
   }
 
