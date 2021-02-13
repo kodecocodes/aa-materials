@@ -1,6 +1,10 @@
 package com.raywenderlich.podplay.service
 
 import com.raywenderlich.podplay.BuildConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -49,7 +53,11 @@ class RssFeedService {
 //        println(result.body()?.string())
         val dbFactory = DocumentBuilderFactory.newInstance()
         val dBuilder = dbFactory.newDocumentBuilder()
-        val doc = dBuilder.parse(result.body()?.byteStream())
+        CoroutineScope(Dispatchers.Default).launch {
+          kotlin.runCatching {
+            val doc = dBuilder.parse(result.body()?.byteStream())
+          }
+        }
         return true
       }
     } catch (t: Throwable) {
