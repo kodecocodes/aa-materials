@@ -48,7 +48,8 @@ dependencies {
 
   // Retrofit / networking
   implementation ("com.squareup.retrofit2:retrofit:$retrofit_version")
-  implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+  implementation ("com.squareup.retrofit2:converter-gson:$retrofit_version")
+  implementation("com.squareup.retrofit2:converter-jaxb:2.9.0")
   implementation ("com.squareup.okhttp3:okhttp:4.8.1")
   implementation ("com.squareup.okhttp3:logging-interceptor:4.8.1")
 }
