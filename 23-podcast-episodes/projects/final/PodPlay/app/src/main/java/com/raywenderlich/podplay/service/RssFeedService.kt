@@ -49,7 +49,7 @@ class RssFeedService {
         println("server error, ${result.code()}, ${result.errorBody()}")
         return null
       } else {
-        var rssFeedResponse : RssFeedResponse? = null
+        var rssFeedResponse: RssFeedResponse? = null
         // return success result
 //        println(result.body()?.string())
         val dbFactory = DocumentBuilderFactory.newInstance()
@@ -72,32 +72,48 @@ class RssFeedService {
     return null
   }
 
-  private fun domToRssFeedResponse(node: Node,
-                                   rssFeedResponse: RssFeedResponse) {
-    // 1
+  private fun domToRssFeedResponse(node: Node, rssFeedResponse: RssFeedResponse) {
     if (node.nodeType == Node.ELEMENT_NODE) {
-      // 2
       val nodeName = node.nodeName
       val parentName = node.parentNode.nodeName
-      // 3
+      // 1
+      val grandParentName = node.parentNode.parentNode?.nodeName ?: ""
+      // 2
+      if (parentName == "item" && grandParentName == "channel") {
+        // 3
+        val currentItem = rssFeedResponse.episodes?.last()
+        if (currentItem != null) {
+          // 4
+          when (nodeName) {
+            "title" -> currentItem.title = node.textContent
+            "description" -> currentItem.description = node.textContent
+            "itunes:duration" -> currentItem.duration = node.textContent
+            "guid" -> currentItem.guid = node.textContent
+            "pubDate" -> currentItem.pubDate = node.textContent
+            "link" -> currentItem.link = node.textContent
+            "enclosure" -> {
+              currentItem.url = node.attributes.getNamedItem("url")
+                  .textContent
+              currentItem.type = node.attributes.getNamedItem("type")
+                  .textContent
+            }
+          }
+        }
+      }
       if (parentName == "channel") {
-        // 4
         when (nodeName) {
           "title" -> rssFeedResponse.title = node.textContent
           "description" -> rssFeedResponse.description = node.textContent
           "itunes:summary" -> rssFeedResponse.summary = node.textContent
-          "item" -> rssFeedResponse.episodes?.
-          add(RssFeedResponse.EpisodeResponse())
+          "item" -> rssFeedResponse.episodes?.add(RssFeedResponse.EpisodeResponse())
           "pubDate" -> rssFeedResponse.lastUpdated =
               DateUtils.xmlDateToDate(node.textContent)
         }
       }
     }
-    // 5
     val nodeList = node.childNodes
     for (i in 0 until nodeList.length) {
       val childNode = nodeList.item(i)
-      // 6
       domToRssFeedResponse(childNode, rssFeedResponse)
     }
   }
