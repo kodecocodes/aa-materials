@@ -117,7 +117,11 @@ class RssFeedService {
       domToRssFeedResponse(childNode, rssFeedResponse)
     }
   }
-
+  companion object {
+    val instance: RssFeedService by lazy {
+      RssFeedService()
+    }
+  }
 }
 
 interface FeedService {

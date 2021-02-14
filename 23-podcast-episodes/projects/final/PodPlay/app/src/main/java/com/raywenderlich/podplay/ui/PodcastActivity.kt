@@ -49,10 +49,11 @@ import com.raywenderlich.podplay.adapter.PodcastListAdapter.PodcastListAdapterLi
 import com.raywenderlich.podplay.databinding.ActivityPodcastBinding
 import com.raywenderlich.podplay.repository.ItunesRepo
 import com.raywenderlich.podplay.repository.PodcastRepo
+import com.raywenderlich.podplay.service.FeedService
 import com.raywenderlich.podplay.service.ItunesService
+import com.raywenderlich.podplay.service.RssFeedService
 import com.raywenderlich.podplay.viewmodel.PodcastViewModel
 import com.raywenderlich.podplay.viewmodel.SearchViewModel
-import com.raywenderlich.podplay.viewmodel.SearchViewModel.PodcastSummaryViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -147,7 +148,8 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener {
   private fun setupViewModels() {
     val service = ItunesService.instance
     searchViewModel.iTunesRepo = ItunesRepo(service)
-    podcastViewModel.podcastRepo = PodcastRepo()
+    val rssService = RssFeedService.instance
+    podcastViewModel.podcastRepo = PodcastRepo(rssService)
   }
 
   private fun addBackStackListener() {

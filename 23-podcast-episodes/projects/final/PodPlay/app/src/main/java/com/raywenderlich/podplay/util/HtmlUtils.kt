@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Razeware LLC
+ * Copyright (c) 2021 Razeware LLC
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,10 @@
  * merger, publication, distribution, sublicensing, creation of derivative works,
  * or sale is expressly withheld.
  *
+ * This project and source code may use libraries or frameworks that are
+ * released under various Open-Source licenses. Use of those libraries and
+ * frameworks are governed by their own individual licenses.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,50 +32,27 @@
  * THE SOFTWARE.
  */
 
-package com.raywenderlich.podplay.repository
+package com.raywenderlich.podplay.util
 
-import com.raywenderlich.podplay.model.Episode
-import com.raywenderlich.podplay.model.Podcast
-import com.raywenderlich.podplay.service.FeedService
-import com.raywenderlich.podplay.service.RssFeedResponse
-import com.raywenderlich.podplay.service.RssFeedService
-import com.raywenderlich.podplay.util.DateUtils
+import android.os.Build
+import android.text.Html
+import android.text.Spanned
 
-class PodcastRepo(private var feedService: RssFeedService) {
-
-  suspend fun getPodcast(feedUrl: String): Podcast? {
-    var podcast: Podcast? = null
-    val rssFeedService = RssFeedService()
-    val feedResponse = rssFeedService.getFeed(feedUrl)
-    if (feedResponse != null) {
-      podcast = rssResponseToPodcast(feedUrl, "", feedResponse)
-    }
-    return podcast
-  }
-
-  private fun rssItemsToEpisodes(episodeResponses: List<RssFeedResponse.EpisodeResponse>): List<Episode> {
-    return episodeResponses.map {
-      Episode(
-          it.guid ?: "",
-          it.title ?: "",
-          it.description ?: "",
-          it.url ?: "",
-          it.type ?: "",
-          DateUtils.xmlDateToDate(it.pubDate),
-          it.duration ?: ""
-      )
-    }
-  }
-
-  private fun rssResponseToPodcast(feedUrl: String, imageUrl:
-  String, rssResponse: RssFeedResponse): Podcast? {
+object HtmlUtils {
+  fun htmlToSpannable(htmlDesc: String): Spanned {
     // 1
-    val items = rssResponse.episodes ?: return null
+    var newHtmlDesc = htmlDesc.replace("\n".toRegex(), "")
+    newHtmlDesc = newHtmlDesc.replace("(<(/)img>)|(<img.+?>)".
+    toRegex(), "")
+
     // 2
-    val description = if (rssResponse.description == "")
-      rssResponse.summary else rssResponse.description
-    // 3
-    return Podcast(feedUrl, rssResponse.title, description, imageUrl,
-        rssResponse.lastUpdated, episodes = rssItemsToEpisodes(items))
+    val descSpan: Spanned
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      descSpan = Html.fromHtml(newHtmlDesc, Html.FROM_HTML_MODE_LEGACY)
+    } else {
+      @Suppress("DEPRECATION")
+      descSpan = Html.fromHtml(newHtmlDesc)
+    }
+    return descSpan
   }
 }
