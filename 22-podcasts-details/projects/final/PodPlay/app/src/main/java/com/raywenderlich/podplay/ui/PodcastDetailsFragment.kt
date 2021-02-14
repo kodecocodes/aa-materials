@@ -36,7 +36,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.raywenderlich.podplay.R
-import com.raywenderlich.podplay.databinding.ActivityPodcastBinding
 import com.raywenderlich.podplay.databinding.FragmentPodcastDetailsBinding
 import com.raywenderlich.podplay.viewmodel.PodcastViewModel
 
@@ -63,8 +62,8 @@ class PodcastDetailsFragment : Fragment() {
     return databinding.root
   }
 
-  override fun onActivityCreated(savedInstanceState: Bundle?) {
-    super.onActivityCreated(savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
     updateControls()
   }
 
