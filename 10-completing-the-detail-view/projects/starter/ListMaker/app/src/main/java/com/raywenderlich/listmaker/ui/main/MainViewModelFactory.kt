@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 
 class MainViewModelFactory(private val sharedPreferences: SharedPreferences) : ViewModelProvider.Factory {
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return MainViewModel(sharedPreferences) as T
-    }
+  override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    return MainViewModel(sharedPreferences) as T
+  }
 }

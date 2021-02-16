@@ -10,23 +10,23 @@ import com.raywenderlich.listmaker.R
 
 class ListDetailFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = ListDetailFragment()
-    }
+  companion object {
+    fun newInstance() = ListDetailFragment()
+  }
 
-    private lateinit var viewModel: ListDetailViewModel
+  private lateinit var viewModel: ListDetailViewModel
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.list_detail_fragment, container, false)
-    }
+  override fun onCreateView(
+      inflater: LayoutInflater, container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
+    return inflater.inflate(R.layout.list_detail_fragment, container, false)
+  }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ListDetailViewModel::class.java)
-        // TODO: Use the ViewModel
-    }
+  override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
+    viewModel = ViewModelProvider(this).get(ListDetailViewModel::class.java)
+    // TODO: Use the ViewModel
+  }
 
 }

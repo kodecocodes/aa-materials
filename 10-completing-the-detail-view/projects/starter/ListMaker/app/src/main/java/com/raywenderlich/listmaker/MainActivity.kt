@@ -18,70 +18,72 @@ import com.raywenderlich.listmaker.ui.main.MainViewModelFactory
 
 class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionListener {
 
-    private lateinit var binding: MainActivityBinding
+  private lateinit var binding: MainActivityBinding
 
-    private lateinit var viewModel: MainViewModel
-    
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+  private lateinit var viewModel: MainViewModel
 
-        viewModel = ViewModelProvider(this,
-            MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(this)))
-            .get(MainViewModel::class.java)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
 
-        binding = MainActivityBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
-        Log.i("MainActivity", viewModel.toString())
+    viewModel = ViewModelProvider(
+        this,
+        MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(this))
+    )
+      .get(MainViewModel::class.java)
 
-        if (savedInstanceState == null) {
-            val mainFragment = MainFragment.newInstance(this)
-            supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, mainFragment)
-                    .commitNow()
-        }
+    binding = MainActivityBinding.inflate(layoutInflater)
+    val view = binding.root
+    setContentView(view)
+    Log.i("MainActivity", viewModel.toString())
 
-        binding.fabButton.setOnClickListener {
-            showCreateListDialog()
-        }
+    if (savedInstanceState == null) {
+      val mainFragment = MainFragment.newInstance(this)
+      supportFragmentManager.beginTransaction()
+        .replace(R.id.container, mainFragment)
+        .commitNow()
     }
 
-    private fun showCreateListDialog() {
+    binding.fabButton.setOnClickListener {
+      showCreateListDialog()
+    }
+  }
 
-        val dialogTitle = getString(R.string.name_of_list)
-        val positiveButtonTitle = getString(R.string.create_list)
+  private fun showCreateListDialog() {
 
-        val builder = AlertDialog.Builder(this)
-        val listTitleEditText = EditText(this)
-        listTitleEditText.inputType = InputType.TYPE_CLASS_TEXT
+    val dialogTitle = getString(R.string.name_of_list)
+    val positiveButtonTitle = getString(R.string.create_list)
 
-        builder.setTitle(dialogTitle)
-        builder.setView(listTitleEditText)
-        builder.setPositiveButton(positiveButtonTitle) { dialog, _ ->
-            dialog.dismiss()
+    val builder = AlertDialog.Builder(this)
+    val listTitleEditText = EditText(this)
+    listTitleEditText.inputType = InputType.TYPE_CLASS_TEXT
 
-            val taskList = TaskList(listTitleEditText.text.toString())
-            viewModel.saveList(taskList)
-            showListDetail(taskList)
-        }
+    builder.setTitle(dialogTitle)
+    builder.setView(listTitleEditText)
+    builder.setPositiveButton(positiveButtonTitle) { dialog, _ ->
+      dialog.dismiss()
 
-        builder.create().show()
+      val taskList = TaskList(listTitleEditText.text.toString())
+      viewModel.saveList(taskList)
+      showListDetail(taskList)
     }
 
-    private fun showListDetail(list: TaskList) {
-        // 1
-        val listDetailIntent = Intent(this, ListDetailActivity::class.java)
-        // 2
-        listDetailIntent.putExtra(INTENT_LIST_KEY, list)
-        // 3
-        startActivity(listDetailIntent)
-    }
+    builder.create().show()
+  }
 
-    override fun listItemTapped(list: TaskList) {
-        showListDetail(list)
-    }
+  private fun showListDetail(list: TaskList) {
+    // 1
+    val listDetailIntent = Intent(this, ListDetailActivity::class.java)
+    // 2
+    listDetailIntent.putExtra(INTENT_LIST_KEY, list)
+    // 3
+    startActivity(listDetailIntent)
+  }
 
-    companion object {
-        const val INTENT_LIST_KEY = "list"
-    }
+  override fun listItemTapped(list: TaskList) {
+    showListDetail(list)
+  }
+
+  companion object {
+    const val INTENT_LIST_KEY = "list"
+  }
 }
