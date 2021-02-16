@@ -107,11 +107,8 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener {
 
 
   override fun onShowDetails(podcastSummaryViewData: SearchViewModel.PodcastSummaryViewData) {
-
     val feedUrl = podcastSummaryViewData.feedUrl ?: return
-
     showProgressBar()
-
     val podcast = podcastViewModel.getPodcast(podcastSummaryViewData)
     hideProgressBar()
     if (podcast != null) {
@@ -148,8 +145,7 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener {
   private fun setupViewModels() {
     val service = ItunesService.instance
     searchViewModel.iTunesRepo = ItunesRepo(service)
-    val rssService = RssFeedService.instance
-    podcastViewModel.podcastRepo = PodcastRepo(rssService)
+    podcastViewModel.podcastRepo = PodcastRepo(RssFeedService.instance)
   }
 
   private fun addBackStackListener() {

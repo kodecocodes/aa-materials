@@ -17,7 +17,7 @@ import retrofit2.http.Url
 import java.util.concurrent.TimeUnit
 import javax.xml.parsers.DocumentBuilderFactory
 
-class RssFeedService {
+class RssFeedService private constructor() {
 
   suspend fun getFeed(xmlFileURL: String): RssFeedResponse? {
     val service: FeedService
@@ -37,8 +37,6 @@ class RssFeedService {
 
     val retrofit = Retrofit.Builder()
         .baseUrl("$xmlFileURL/")
-//        .addConverterFactory(JaxbConverterFactory.create())
-//        .addConverterFactory(Xml.asConverterFactory(contentType))
         .build()
     service = retrofit.create(FeedService::class.java)
 
@@ -50,8 +48,6 @@ class RssFeedService {
         return null
       } else {
         var rssFeedResponse: RssFeedResponse? = null
-        // return success result
-//        println(result.body()?.string())
         val dbFactory = DocumentBuilderFactory.newInstance()
         val dBuilder = dbFactory.newDocumentBuilder()
         CoroutineScope(Dispatchers.Default).launch {

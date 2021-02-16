@@ -56,7 +56,6 @@ class PodcastViewModel(application: Application) : AndroidViewModel(application)
         it.feedTitle = podcastSummaryViewData.name ?: ""
         it.imageUrl = podcastSummaryViewData.imageUrl ?: ""
         activePodcastViewData = podcastToPodcastView(it)
-
       }
     }
     return activePodcastViewData
