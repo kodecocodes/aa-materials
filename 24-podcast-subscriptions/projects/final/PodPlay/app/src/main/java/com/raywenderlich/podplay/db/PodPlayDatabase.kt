@@ -55,11 +55,13 @@ class Converters {
   }
 }
 
+// 1
 @Database(entities = arrayOf(Podcast::class, Episode::class), version = 1)
 @TypeConverters(Converters::class)
 abstract class PodPlayDatabase : RoomDatabase() {
-
+  // 2
   abstract fun podcastDao(): PodcastDao
+
   private class PodPlayDatabaseCallback(
       private val scope: CoroutineScope
   ) : RoomDatabase.Callback() {
@@ -73,16 +75,22 @@ abstract class PodPlayDatabase : RoomDatabase() {
     }
 
   }
+
+  // 3
   companion object {
 
+    // 4
     @Volatile
     private var INSTANCE: PodPlayDatabase? = null
 
+    // 5
     fun getInstance(context: Context, coroutineScope: CoroutineScope): PodPlayDatabase {
       val tempInstance = INSTANCE
       if (tempInstance != null) {
         return tempInstance
       }
+
+      // 6
       synchronized(this) {
         val instance = Room.databaseBuilder(context.applicationContext,
             PodPlayDatabase::class.java,
@@ -90,6 +98,7 @@ abstract class PodPlayDatabase : RoomDatabase() {
             .addCallback(PodPlayDatabaseCallback(coroutineScope))
             .build()
         INSTANCE = instance
+        // 7
         return instance
       }
     }

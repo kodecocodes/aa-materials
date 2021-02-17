@@ -46,7 +46,7 @@ import com.raywenderlich.podplay.model.Podcast
 @Dao
 interface PodcastDao {
   @Query("SELECT * FROM Podcast ORDER BY FeedTitle")
-  suspend fun loadPodcasts(): LiveData<List<Podcast>>
+  fun loadPodcasts(): LiveData<List<Podcast>>
 
   @Query("SELECT * FROM Episode WHERE podcastId = :podcastId ORDER BY releaseDate DESC")
   suspend fun loadEpisodes(podcastId: Long): List<Episode>
