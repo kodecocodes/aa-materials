@@ -32,31 +32,66 @@
  *   THE SOFTWARE.
  */
 
-package com.raywenderlich.podplay.model
+package com.raywenderlich.podplay.db
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import android.content.Context
+import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.raywenderlich.podplay.model.Episode
+import com.raywenderlich.podplay.model.Podcast
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.util.*
 
-@Entity(
-    foreignKeys = [
-      ForeignKey(
-          entity = Podcast::class,
-          parentColumns = ["id"],
-          childColumns = ["podcastId"],
-          onDelete = ForeignKey.CASCADE)
-    ],
-    indices = [Index("podcastId")]
-)
-data class Episode (
-    @PrimaryKey var guid: String = "",
-    var podcastId: Long? = null,
-    var title: String = "",
-    var description: String = "",
-    var mediaUrl: String = "",
-    var mimeType: String = "",
-    var releaseDate: Date = Date(),
-    var duration: String = ""
-)
+class Converters {
+  @TypeConverter
+  fun fromTimestamp(value: Long?): Date? {
+    return if (value == null) null else Date(value)
+  }
+
+  @TypeConverter
+  fun toTimestamp(date: Date?): Long? {
+    return (date?.time)
+  }
+}
+
+@Database(entities = arrayOf(Podcast::class, Episode::class), version = 1)
+@TypeConverters(Converters::class)
+abstract class PodPlayDatabase : RoomDatabase() {
+
+  abstract fun podcastDao(): PodcastDao
+  private class PodPlayDatabaseCallback(
+      private val scope: CoroutineScope
+  ) : RoomDatabase.Callback() {
+
+    override fun onCreate(db: SupportSQLiteDatabase) {
+      super.onCreate(db)
+      INSTANCE?.let { database ->
+        scope.launch {
+        }
+      }
+    }
+
+  }
+  companion object {
+
+    @Volatile
+    private var INSTANCE: PodPlayDatabase? = null
+
+    fun getInstance(context: Context, coroutineScope: CoroutineScope): PodPlayDatabase {
+      val tempInstance = INSTANCE
+      if (tempInstance != null) {
+        return tempInstance
+      }
+      synchronized(this) {
+        val instance = Room.databaseBuilder(context.applicationContext,
+            PodPlayDatabase::class.java,
+            "PodPlayer")
+            .addCallback(PodPlayDatabaseCallback(coroutineScope))
+            .build()
+        INSTANCE = instance
+        return instance
+      }
+    }
+  }
+}

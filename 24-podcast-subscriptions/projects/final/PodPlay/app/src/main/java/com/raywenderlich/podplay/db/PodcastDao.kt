@@ -32,31 +32,34 @@
  *   THE SOFTWARE.
  */
 
-package com.raywenderlich.podplay.model
+package com.raywenderlich.podplay.db
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import java.util.*
+import androidx.lifecycle.LiveData
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy.REPLACE
+import androidx.room.Query
+import com.raywenderlich.podplay.model.Episode
+import com.raywenderlich.podplay.model.Podcast
 
-@Entity(
-    foreignKeys = [
-      ForeignKey(
-          entity = Podcast::class,
-          parentColumns = ["id"],
-          childColumns = ["podcastId"],
-          onDelete = ForeignKey.CASCADE)
-    ],
-    indices = [Index("podcastId")]
-)
-data class Episode (
-    @PrimaryKey var guid: String = "",
-    var podcastId: Long? = null,
-    var title: String = "",
-    var description: String = "",
-    var mediaUrl: String = "",
-    var mimeType: String = "",
-    var releaseDate: Date = Date(),
-    var duration: String = ""
-)
+@Dao
+interface PodcastDao {
+  @Query("SELECT * FROM Podcast ORDER BY FeedTitle")
+  suspend fun loadPodcasts(): LiveData<List<Podcast>>
+
+  @Query("SELECT * FROM Episode WHERE podcastId = :podcastId ORDER BY releaseDate DESC")
+  suspend fun loadEpisodes(podcastId: Long): List<Episode>
+
+  @Query("SELECT * FROM Podcast WHERE feedUrl = :url")
+  suspend fun loadPodcast(url: String): Podcast?
+
+  @Insert(onConflict = REPLACE)
+  suspend fun insertPodcast(podcast: Podcast): Long
+
+  @Insert(onConflict = REPLACE)
+  suspend fun insertEpisode(episode: Episode): Long
+
+  @Delete
+  suspend fun deletePodcast(podcast: Podcast)
+}

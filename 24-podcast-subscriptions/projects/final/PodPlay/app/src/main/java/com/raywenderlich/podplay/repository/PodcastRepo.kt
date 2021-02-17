@@ -56,6 +56,7 @@ class PodcastRepo(private var feedService: RssFeedService) {
     return episodeResponses.map {
       Episode(
           it.guid ?: "",
+          null,
           it.title ?: "",
           it.description ?: "",
           it.url ?: "",
