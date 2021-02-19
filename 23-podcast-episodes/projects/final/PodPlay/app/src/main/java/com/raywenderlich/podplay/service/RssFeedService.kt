@@ -35,12 +35,12 @@ class RssFeedService private constructor() {
     client.build()
 
     val retrofit = Retrofit.Builder()
-        .baseUrl("$xmlFileURL/")
+        .baseUrl("${xmlFileURL.split("?")[0]}/")
         .build()
     service = retrofit.create(FeedService::class.java)
 
     try {
-      val result = service.getFeed("$xmlFileURL/")
+      val result = service.getFeed(xmlFileURL)
       if (result.code() >= 400) {
         // TODO : // create an error from error body and return
         println("server error, ${result.code()}, ${result.errorBody()}")
