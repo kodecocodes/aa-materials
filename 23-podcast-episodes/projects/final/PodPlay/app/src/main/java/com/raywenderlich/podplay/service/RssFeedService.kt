@@ -2,9 +2,8 @@ package com.raywenderlich.podplay.service
 
 import com.raywenderlich.podplay.BuildConfig
 import com.raywenderlich.podplay.util.DateUtils
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
@@ -50,14 +49,12 @@ class RssFeedService private constructor() {
         var rssFeedResponse: RssFeedResponse? = null
         val dbFactory = DocumentBuilderFactory.newInstance()
         val dBuilder = dbFactory.newDocumentBuilder()
-        CoroutineScope(Dispatchers.Default).launch {
-          kotlin.runCatching {
-            val doc = dBuilder.parse(result.body()?.byteStream())
-            val rss = RssFeedResponse(episodes = mutableListOf())
-            domToRssFeedResponse(doc, rss)
-            println(rss)
-            rssFeedResponse = rss
-          }
+        withContext(Dispatchers.IO) {
+          val doc = dBuilder.parse(result.body()?.byteStream())
+          val rss = RssFeedResponse(episodes = mutableListOf())
+          domToRssFeedResponse(doc, rss)
+          println(rss)
+          rssFeedResponse = rss
         }
         return rssFeedResponse
       }

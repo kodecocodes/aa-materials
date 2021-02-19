@@ -32,6 +32,8 @@ package com.raywenderlich.podplay.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.raywenderlich.podplay.model.Episode
 import com.raywenderlich.podplay.model.Podcast
@@ -43,22 +45,23 @@ import java.util.*
 class PodcastViewModel(application: Application) : AndroidViewModel(application) {
 
   var podcastRepo: PodcastRepo? = null
-  var activePodcastViewData: PodcastViewData? = null
+  private val _podcastLiveData = MutableLiveData<PodcastViewData?>()
+  val podcastLiveData: LiveData<PodcastViewData?> = _podcastLiveData
 
-  fun getPodcast(podcastSummaryViewData: PodcastSummaryViewData): PodcastViewData? {
-
-    val repo = podcastRepo ?: return null
-    val feedUrl = podcastSummaryViewData.feedUrl ?: return null
-
-    viewModelScope.launch {
-      val podcast = repo.getPodcast(feedUrl)
-      podcast?.let {
-        it.feedTitle = podcastSummaryViewData.name ?: ""
-        it.imageUrl = podcastSummaryViewData.imageUrl ?: ""
-        activePodcastViewData = podcastToPodcastView(it)
+  fun getPodcast(podcastSummaryViewData: PodcastSummaryViewData) {
+    podcastSummaryViewData.feedUrl?.let { url ->
+      viewModelScope.launch {
+        podcastRepo?.getPodcast(url)?.let {
+          it.feedTitle = podcastSummaryViewData.name ?: ""
+          it.imageUrl = podcastSummaryViewData.imageUrl ?: ""
+          _podcastLiveData.value = podcastToPodcastView(it)
+        } ?: run {
+          _podcastLiveData.value = null
+        }
       }
+    } ?: run {
+      _podcastLiveData.value = null
     }
-    return activePodcastViewData
   }
 
   private fun podcastToPodcastView(podcast: Podcast): PodcastViewData {

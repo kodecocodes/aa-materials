@@ -68,39 +68,35 @@ class PodcastDetailsFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    setupControls()
-    updateControls()
+
+    podcastViewModel.podcastLiveData.observe(viewLifecycleOwner, { viewData ->
+      if (viewData != null) {
+        databinding.feedTitleTextView.text = viewData.feedTitle
+        databinding.feedDescTextView.text = viewData.feedDesc
+        activity?.let { activity ->
+          Glide.with(activity).load(viewData.imageUrl).into(databinding.feedImageView)
+        }
+
+        // 1
+        databinding.feedDescTextView.movementMethod = ScrollingMovementMethod()
+        // 2
+        databinding.episodeRecyclerView.setHasFixedSize(true)
+
+        val layoutManager = LinearLayoutManager(activity)
+        databinding.episodeRecyclerView.layoutManager = layoutManager
+
+        val dividerItemDecoration = DividerItemDecoration(
+            databinding.episodeRecyclerView.context, layoutManager.orientation)
+        databinding.episodeRecyclerView.addItemDecoration(dividerItemDecoration)
+        // 3
+        episodeListAdapter = EpisodeListAdapter(viewData.episodes)
+        databinding.episodeRecyclerView.adapter = episodeListAdapter
+      }
+    })
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
     inflater.inflate(R.menu.menu_details, menu)
-  }
-
-  private fun updateControls() {
-    val viewData = podcastViewModel.activePodcastViewData ?: return
-    databinding.feedTitleTextView.text = viewData.feedTitle
-    databinding.feedDescTextView.text = viewData.feedDesc
-    activity?.let { activity ->
-      Glide.with(activity).load(viewData.imageUrl).into(databinding.feedImageView)
-    }
-  }
-
-  private fun setupControls() {
-    // 1
-    databinding.feedDescTextView.movementMethod = ScrollingMovementMethod()
-    // 2
-    databinding.episodeRecyclerView.setHasFixedSize(true)
-
-    val layoutManager = LinearLayoutManager(activity)
-    databinding.episodeRecyclerView.layoutManager = layoutManager
-
-    val dividerItemDecoration = DividerItemDecoration(
-        databinding.episodeRecyclerView.context, layoutManager.orientation)
-    databinding.episodeRecyclerView.addItemDecoration(dividerItemDecoration)
-    // 3
-    episodeListAdapter = EpisodeListAdapter(
-        podcastViewModel.activePodcastViewData?.episodes)
-    databinding.episodeRecyclerView.adapter = episodeListAdapter
   }
 }
