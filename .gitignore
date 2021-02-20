@@ -287,3 +287,4 @@ DerivedData/
 
 ## Gcc Patch
 /*.gcno
+01-getting-set-up-with-android-studio/projects/starter/timefighter/.idea
