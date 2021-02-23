@@ -1,17 +1,15 @@
 package com.raywenderlich.listmaker.ui.detail.ui.detail
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.raywenderlich.listmaker.MainActivity
-import com.raywenderlich.listmaker.R
 import com.raywenderlich.listmaker.databinding.ListDetailFragmentBinding
-import com.raywenderlich.listmaker.databinding.MainFragmentBinding
 import com.raywenderlich.listmaker.models.TaskList
 import com.raywenderlich.listmaker.ui.main.MainViewModel
 import com.raywenderlich.listmaker.ui.main.MainViewModelFactory
