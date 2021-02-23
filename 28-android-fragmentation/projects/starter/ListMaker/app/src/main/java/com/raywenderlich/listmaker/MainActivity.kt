@@ -1,107 +1,113 @@
 package com.raywenderlich.listmaker
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
-import android.view.Menu
-import android.view.MenuItem
+import android.util.Log
 import android.widget.EditText
-import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import androidx.core.os.bundleOf
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
+import androidx.fragment.app.replace
+import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
+import com.raywenderlich.listmaker.databinding.MainActivityBinding
+import com.raywenderlich.listmaker.models.TaskList
+import com.raywenderlich.listmaker.ui.detail.ListDetailActivity
+import com.raywenderlich.listmaker.ui.detail.ui.detail.ListDetailFragment
+import com.raywenderlich.listmaker.ui.main.MainFragment
+import com.raywenderlich.listmaker.ui.main.MainViewModel
+import com.raywenderlich.listmaker.ui.main.MainViewModelFactory
 
-class MainActivity : AppCompatActivity(), ListSelectionFragment.OnListItemFragmentInteractionListener {
+class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionListener {
 
-  private var largeScreen = false
-  private var listFragment: ListDetailFragment? = null
+  private lateinit var binding: MainActivityBinding
 
-  private var fragmentContainer: FrameLayout? = null
-
-  private var listSelectionFragment: ListSelectionFragment = ListSelectionFragment.newInstance()
+  private lateinit var viewModel: MainViewModel
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
-    setSupportActionBar(toolbar)
 
-    listSelectionFragment = supportFragmentManager.findFragmentById(R.id.list_selection_fragment) as ListSelectionFragment
+    viewModel = ViewModelProvider(
+      this,
+      MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(this))
+    ).get(MainViewModel::class.java)
 
-    fragmentContainer = findViewById(R.id.fragment_container)
+    binding = MainActivityBinding.inflate(layoutInflater)
+    val view = binding.root
+    setContentView(view)
+    Log.i("MainActivity", viewModel.toString())
 
-    largeScreen = fragmentContainer != null
+    if (savedInstanceState == null) {
+      val mainFragment = MainFragment.newInstance()
+      mainFragment.clickListener = this
 
-    fab.setOnClickListener {
+      val fragmentContainerViewId: Int = if (binding.mainFragmentContainer == null) {
+        R.id.detail_container
+      } else {
+        R.id.main_fragment_container
+      }
+
+      supportFragmentManager.commit {
+        setReorderingAllowed(true)
+        add(fragmentContainerViewId, mainFragment)
+      }
+    }
+
+    binding.fabButton.setOnClickListener {
       showCreateListDialog()
     }
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    menuInflater.inflate(R.menu.menu_main, menu)
-    return true
-  }
+  override fun onBackPressed() {
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
-    return when (item.itemId) {
-      R.id.action_settings -> true
-      else -> super.onOptionsItemSelected(item)
+    // 1
+    val listDetailFragment =
+      supportFragmentManager.findFragmentById(R.id.list_detail_fragment_container)
+
+    // 2
+    if (listDetailFragment == null) {
+      super.onBackPressed()
+    } else {
+      // 3
+      title = resources.getString(R.string.app_name)
+
+      // 4
+      supportFragmentManager.commit {
+        setReorderingAllowed(true)
+        remove(listDetailFragment)
+      }
+
+      // 5
+      binding.fabButton.setOnClickListener {
+        showCreateListDialog()
+      }
     }
   }
 
   private fun showCreateListDialog() {
-    // 1
+
     val dialogTitle = getString(R.string.name_of_list)
     val positiveButtonTitle = getString(R.string.create_list)
 
-    // 2
     val builder = AlertDialog.Builder(this)
     val listTitleEditText = EditText(this)
     listTitleEditText.inputType = InputType.TYPE_CLASS_TEXT
 
     builder.setTitle(dialogTitle)
     builder.setView(listTitleEditText)
-
-    // 3
     builder.setPositiveButton(positiveButtonTitle) { dialog, _ ->
-
-      val list = TaskList(listTitleEditText.text.toString())
-      listSelectionFragment.addList(list)
-
       dialog.dismiss()
-      showListDetail(list)
+
+      val taskList = TaskList(listTitleEditText.text.toString())
+      viewModel.saveList(taskList)
+      showListDetail(taskList)
     }
 
-    // 4
     builder.create().show()
-  }
-
-  private fun showListDetail(list: TaskList) {
-
-    if (!largeScreen) {
-
-      val listDetailIntent = Intent(this, ListDetailActivity::class.java)
-      listDetailIntent.putExtra(INTENT_LIST_KEY, list)
-
-      startActivityForResult(listDetailIntent, LIST_DETAIL_REQUEST_CODE)
-    } else {
-      title = list.name
-
-      listFragment = ListDetailFragment.newInstance(list)
-      listFragment?.let {
-        supportFragmentManager.beginTransaction()
-          .replace(R.id.fragment_container, it, getString(R.string.list_fragment_tag))
-          .addToBackStack(null)
-          .commit()
-      }
-
-      fab.setOnClickListener {
-        showCreateTaskDialog()
-      }
-    }
   }
 
   private fun showCreateTaskDialog() {
@@ -113,49 +119,45 @@ class MainActivity : AppCompatActivity(), ListSelectionFragment.OnListItemFragme
       .setView(taskEditText)
       .setPositiveButton(R.string.add_task) { dialog, _ ->
         val task = taskEditText.text.toString()
-        listFragment?.addTask(task)
+        viewModel.addTask(task)
         dialog.dismiss()
       }
       .create()
       .show()
   }
 
-  override fun onBackPressed() {
-    super.onBackPressed()
+  private fun showListDetail(list: TaskList) {
 
-    // 1
-    title = resources.getString(R.string.app_name)
+    if (binding.mainFragmentContainer == null) {
+      val listDetailIntent = Intent(this, ListDetailActivity::class.java)
+      listDetailIntent.putExtra(INTENT_LIST_KEY, list)
+      startActivityForResult(listDetailIntent, LIST_DETAIL_REQUEST_CODE)
+    } else {
+      val bundle = bundleOf(INTENT_LIST_KEY to list)
+      supportFragmentManager.commit {
+        setReorderingAllowed(true)
+        replace(R.id.list_detail_fragment_container, ListDetailFragment::class.java, bundle)
+      }
 
-    // 2
-    listFragment?.list?.let {
-      listSelectionFragment.listDataManager.saveList(it)
-    }
-
-    // 3
-    listFragment?.let {
-      supportFragmentManager
-        .beginTransaction()
-        .remove(it)
-        .commit()
-      listFragment = null
-    }
-
-    // 4
-    fab.setOnClickListener {
-      showCreateListDialog()
+      binding.fabButton.setOnClickListener {
+        showCreateTaskDialog()
+      }
     }
   }
 
-  override fun onListItemClicked(list: TaskList) {
+  override fun listItemTapped(list: TaskList) {
     showListDetail(list)
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
-
-    if (requestCode == LIST_DETAIL_REQUEST_CODE) {
+    // 1
+    if (requestCode == LIST_DETAIL_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+      // 2
       data?.let {
-        listSelectionFragment.saveList(data.getParcelableExtra(INTENT_LIST_KEY) as TaskList)
+        // 3
+        viewModel.updateList(data.getParcelableExtra(INTENT_LIST_KEY)!!)
+        viewModel.refreshLists()
       }
     }
   }
