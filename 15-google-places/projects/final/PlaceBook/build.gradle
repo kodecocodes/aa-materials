@@ -2,9 +2,9 @@
 
 buildscript {
   ext {
-    kotlin_version = '1.4.21'
+    kotlin_version = '1.4.30'
     maps_services_version = '17.0.0'
-    location_services_version = '17.1.0'
+    location_services_version = '18.0.0'
   }
 
   repositories {
