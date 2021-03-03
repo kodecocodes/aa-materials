@@ -40,18 +40,20 @@ import com.bumptech.glide.Glide
 import com.raywenderlich.podplay.databinding.SearchItemBinding
 import com.raywenderlich.podplay.viewmodel.SearchViewModel.PodcastSummaryViewData
 
-class PodcastListAdapter(private var podcastSummaryViewList: List<PodcastSummaryViewData>?,
-                         private val podcastListAdapterListener: PodcastListAdapterListener,
-                         private val parentActivity: Activity) :
-    RecyclerView.Adapter<PodcastListAdapter.ViewHolder>() {
+class PodcastListAdapter(
+    private var podcastSummaryViewList: List<PodcastSummaryViewData>?,
+    private val podcastListAdapterListener: PodcastListAdapterListener,
+    private val parentActivity: Activity
+) : RecyclerView.Adapter<PodcastListAdapter.ViewHolder>() {
 
   interface PodcastListAdapterListener {
     fun onShowDetails(podcastSummaryViewData: PodcastSummaryViewData)
   }
 
-  inner class ViewHolder(databinding: SearchItemBinding,
-                         private val podcastListAdapterListener: PodcastListAdapterListener) :
-      RecyclerView.ViewHolder(databinding.root) {
+  inner class ViewHolder(
+      databinding: SearchItemBinding,
+      private val podcastListAdapterListener: PodcastListAdapterListener
+  ) : RecyclerView.ViewHolder(databinding.root) {
     var podcastSummaryViewData: PodcastSummaryViewData? = null
     val nameTextView: TextView = databinding.podcastNameTextView
     val lastUpdatedTextView: TextView = databinding.podcastLastUpdatedTextView
@@ -72,8 +74,10 @@ class PodcastListAdapter(private var podcastSummaryViewList: List<PodcastSummary
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PodcastListAdapter.ViewHolder {
-    return ViewHolder(SearchItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-        podcastListAdapterListener)
+    return ViewHolder(
+        SearchItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+        podcastListAdapterListener
+    )
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
