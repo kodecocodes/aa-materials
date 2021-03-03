@@ -38,31 +38,30 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.appcompat.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Observer
-import androidx.lifecycle.viewModelScope
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.raywenderlich.podplay.R
 import com.raywenderlich.podplay.adapter.PodcastListAdapter
 import com.raywenderlich.podplay.adapter.PodcastListAdapter.PodcastListAdapterListener
 import com.raywenderlich.podplay.databinding.ActivityPodcastBinding
-import com.raywenderlich.podplay.db.PodPlayDatabase
 import com.raywenderlich.podplay.repository.ItunesRepo
 import com.raywenderlich.podplay.repository.PodcastRepo
-import com.raywenderlich.podplay.service.FeedService
 import com.raywenderlich.podplay.service.ItunesService
 import com.raywenderlich.podplay.service.RssFeedService
+import com.raywenderlich.podplay.ui.PodcastDetailsFragment.OnPodcastDetailsListener
 import com.raywenderlich.podplay.viewmodel.PodcastViewModel
 import com.raywenderlich.podplay.viewmodel.SearchViewModel
-import com.raywenderlich.podplay.ui.PodcastDetailsFragment.OnPodcastDetailsListener
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
     OnPodcastDetailsListener {
@@ -124,11 +123,8 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
 
 
   override fun onShowDetails(podcastSummaryViewData: SearchViewModel.PodcastSummaryViewData) {
-
     val feedUrl = podcastSummaryViewData.feedUrl ?: return
-
     showProgressBar()
-
     val podcast = podcastViewModel.getPodcast(podcastSummaryViewData)
     hideProgressBar()
     if (podcast != null) {
@@ -179,7 +175,7 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
   }
 
   private fun setupPodcastListView() {
-    podcastViewModel.getPodcasts()?.observe(this, Observer {
+    podcastViewModel.getPodcasts()?.observe(this, {
       if (it != null) {
         showSubscribedPodcasts()
       }

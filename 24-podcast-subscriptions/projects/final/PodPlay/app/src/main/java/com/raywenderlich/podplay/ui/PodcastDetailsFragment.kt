@@ -30,6 +30,7 @@
 
 package com.raywenderlich.podplay.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.*
@@ -48,6 +49,7 @@ class PodcastDetailsFragment : Fragment() {
   private val podcastViewModel: PodcastViewModel by activityViewModels()
   private lateinit var databinding: FragmentPodcastDetailsBinding
   private lateinit var episodeListAdapter: EpisodeListAdapter
+  private var listener: OnPodcastDetailsListener? = null
 
   companion object {
     fun newInstance(): PodcastDetailsFragment {
@@ -95,8 +97,36 @@ class PodcastDetailsFragment : Fragment() {
     })
   }
 
+  override fun onAttach(context: Context) {
+    super.onAttach(context)
+    if (context is OnPodcastDetailsListener) {
+      listener = context
+    } else {
+      throw RuntimeException(context.toString() +
+          " must implement OnPodcastDetailsListener")
+    }
+  }
+
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
     inflater.inflate(R.menu.menu_details, menu)
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    return when (item.itemId) {
+      R.id.menu_feed_action -> {
+        podcastViewModel.podcastLiveData.value?.feedUrl?.let {
+          listener?.onSubscribe()
+        }
+        true
+      }
+      else ->
+        super.onOptionsItemSelected(item)
+    }
+  }
+
+  interface OnPodcastDetailsListener {
+    fun onSubscribe()
+    fun onUnsubscribe()
   }
 }
