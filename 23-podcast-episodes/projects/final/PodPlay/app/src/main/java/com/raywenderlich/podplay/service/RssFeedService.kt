@@ -46,7 +46,7 @@ class RssFeedService private constructor() {
         println("server error, ${result.code()}, ${result.errorBody()}")
         return null
       } else {
-        var rssFeedResponse: RssFeedResponse? = null
+        var rssFeedResponse: RssFeedResponse?
         val dbFactory = DocumentBuilderFactory.newInstance()
         val dBuilder = dbFactory.newDocumentBuilder()
         withContext(Dispatchers.IO) {
