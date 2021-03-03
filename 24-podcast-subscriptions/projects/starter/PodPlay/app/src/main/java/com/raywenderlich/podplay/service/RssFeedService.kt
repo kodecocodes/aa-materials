@@ -2,9 +2,8 @@ package com.raywenderlich.podplay.service
 
 import com.raywenderlich.podplay.BuildConfig
 import com.raywenderlich.podplay.util.DateUtils
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
@@ -17,7 +16,7 @@ import retrofit2.http.Url
 import java.util.concurrent.TimeUnit
 import javax.xml.parsers.DocumentBuilderFactory
 
-class RssFeedService {
+class RssFeedService private constructor() {
 
   suspend fun getFeed(xmlFileURL: String): RssFeedResponse? {
     val service: FeedService
@@ -36,32 +35,26 @@ class RssFeedService {
     client.build()
 
     val retrofit = Retrofit.Builder()
-        .baseUrl("$xmlFileURL/")
-//        .addConverterFactory(JaxbConverterFactory.create())
-//        .addConverterFactory(Xml.asConverterFactory(contentType))
+        .baseUrl("${xmlFileURL.split("?")[0]}/")
         .build()
     service = retrofit.create(FeedService::class.java)
 
     try {
-      val result = service.getFeed("$xmlFileURL/")
+      val result = service.getFeed(xmlFileURL)
       if (result.code() >= 400) {
         // TODO : // create an error from error body and return
         println("server error, ${result.code()}, ${result.errorBody()}")
         return null
       } else {
-        var rssFeedResponse: RssFeedResponse? = null
-        // return success result
-//        println(result.body()?.string())
+        var rssFeedResponse: RssFeedResponse?
         val dbFactory = DocumentBuilderFactory.newInstance()
         val dBuilder = dbFactory.newDocumentBuilder()
-        CoroutineScope(Dispatchers.Default).launch {
-          kotlin.runCatching {
-            val doc = dBuilder.parse(result.body()?.byteStream())
-            val rss = RssFeedResponse(episodes = mutableListOf())
-            domToRssFeedResponse(doc, rss)
-            println(rss)
-            rssFeedResponse = rss
-          }
+        withContext(Dispatchers.IO) {
+          val doc = dBuilder.parse(result.body()?.byteStream())
+          val rss = RssFeedResponse(episodes = mutableListOf())
+          domToRssFeedResponse(doc, rss)
+          println(rss)
+          rssFeedResponse = rss
         }
         return rssFeedResponse
       }
