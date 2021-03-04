@@ -55,6 +55,18 @@ class PodcastViewModel(application: Application) : AndroidViewModel(application)
 
   private var activePodcast: Podcast? = null
 
+  suspend fun setActivePodcast(feedUrl: String): PodcastSummaryViewData? {
+    val repo = podcastRepo ?: return null
+    val podcast = repo.getPodcast(feedUrl)
+      if (podcast == null) {
+        return null
+      } else {
+        _podcastLiveData.value = podcastToPodcastView(podcast)
+        activePodcast = podcast
+        return podcastToSummaryView(podcast)
+      }
+  }
+
   fun getPodcast(podcastSummaryViewData: PodcastSummaryViewData) {
     podcastSummaryViewData.feedUrl?.let { url ->
       viewModelScope.launch {

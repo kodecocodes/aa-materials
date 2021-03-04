@@ -45,8 +45,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.*
 import com.raywenderlich.podplay.R
 import com.raywenderlich.podplay.adapter.PodcastListAdapter
 import com.raywenderlich.podplay.adapter.PodcastListAdapter.PodcastListAdapterListener
@@ -58,10 +60,12 @@ import com.raywenderlich.podplay.service.RssFeedService
 import com.raywenderlich.podplay.ui.PodcastDetailsFragment.OnPodcastDetailsListener
 import com.raywenderlich.podplay.viewmodel.PodcastViewModel
 import com.raywenderlich.podplay.viewmodel.SearchViewModel
+import com.raywenderlich.podplay.worker.EpisodeUpdateWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 
 class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
     OnPodcastDetailsListener {
@@ -82,6 +86,7 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
     setupPodcastListView()
     handleIntent(intent)
     addBackStackListener()
+    scheduleJobs()
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -91,16 +96,17 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
     searchMenuItem = menu.findItem(R.id.search_item)
     val searchView = searchMenuItem.actionView as SearchView
 
-    searchMenuItem.setOnActionExpandListener(object: MenuItem.OnActionExpandListener {
+    searchMenuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
       override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
         return true
       }
+
       override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
         showSubscribedPodcasts()
         return true
       }
     })
-    
+
     val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
     searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
 
@@ -134,6 +140,21 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
     }
   }
 
+  private fun scheduleJobs() {
+    val constraints: Constraints = Constraints.Builder().apply {
+      setRequiredNetworkType(NetworkType.CONNECTED)
+      setRequiresCharging(true)
+    }.build()
+
+    val request = PeriodicWorkRequestBuilder<EpisodeUpdateWorker>(
+        1, TimeUnit.HOURS)
+        .setConstraints(constraints)
+        .build()
+
+    WorkManager.getInstance(this).enqueueUniquePeriodicWork(TAG_EPISODE_UPDATE_JOB,
+        ExistingPeriodicWorkPolicy.REPLACE, request)
+  }
+
   private fun showSubscribedPodcasts() {
     val podcasts = podcastViewModel.getPodcasts()?.value
 
@@ -159,6 +180,13 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
     if (Intent.ACTION_SEARCH == intent.action) {
       val query = intent.getStringExtra(SearchManager.QUERY) ?: return
       performSearch(query)
+    }
+    val podcastFeedUrl = intent.getStringExtra(EpisodeUpdateWorker.EXTRA_FEED_URL)
+    if (podcastFeedUrl != null) {
+      podcastViewModel.viewModelScope.launch {
+        val podcastSummaryViewData = podcastViewModel.setActivePodcast(podcastFeedUrl)
+        podcastSummaryViewData?.let { podcastSummaryView -> onShowDetails(podcastSummaryView) }
+      }
     }
   }
 
@@ -239,6 +267,7 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
 
   companion object {
     private const val TAG_DETAILS_FRAGMENT = "DetailsFragment"
+    private const val TAG_EPISODE_UPDATE_JOB = "com.raywenderlich.podplay.episodes"
   }
 
   override fun onSubscribe() {
