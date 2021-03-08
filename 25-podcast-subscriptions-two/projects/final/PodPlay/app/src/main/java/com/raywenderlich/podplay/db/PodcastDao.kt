@@ -49,20 +49,20 @@ interface PodcastDao {
   fun loadPodcasts(): LiveData<List<Podcast>>
 
   @Query("SELECT * FROM Podcast ORDER BY FeedTitle")
-  fun loadPodcastsStatic(): List<Podcast>
+  suspend fun loadPodcastsStatic(): List<Podcast>
 
   @Query("SELECT * FROM Episode WHERE podcastId = :podcastId ORDER BY releaseDate DESC")
-  fun loadEpisodes(podcastId: Long): List<Episode>
+  suspend fun loadEpisodes(podcastId: Long): List<Episode>
 
   @Query("SELECT * FROM Podcast WHERE feedUrl = :url")
-  fun loadPodcast(url: String): Podcast?
+  suspend fun loadPodcast(url: String): Podcast?
 
   @Insert(onConflict = REPLACE)
-  fun insertPodcast(podcast: Podcast): Long
+  suspend fun insertPodcast(podcast: Podcast): Long
 
   @Insert(onConflict = REPLACE)
-  fun insertEpisode(episode: Episode): Long
+  suspend fun insertEpisode(episode: Episode): Long
 
   @Delete
-  fun deletePodcast(podcast: Podcast)
+  suspend fun deletePodcast(podcast: Podcast)
 }
