@@ -137,7 +137,7 @@ class PodplayMediaCallback(val context: Context,
   private fun initializeMediaPlayer() {
     if (mediaPlayer == null) {
       mediaPlayer = MediaPlayer()
-      mediaPlayer!!.setOnCompletionListener{
+      mediaPlayer?.setOnCompletionListener{
         setState(PlaybackStateCompat.STATE_PAUSED)
       }
     }
