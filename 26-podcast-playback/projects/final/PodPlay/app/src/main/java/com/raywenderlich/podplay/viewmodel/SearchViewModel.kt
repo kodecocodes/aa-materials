@@ -56,7 +56,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     return PodcastSummaryViewData(
         itunesPodcast.collectionCensoredName,
         DateUtils.jsonDateToShortDate(itunesPodcast.releaseDate),
-        itunesPodcast.artworkUrl30,
+        itunesPodcast.artworkUrl100,
         itunesPodcast.feedUrl)
   }
 
