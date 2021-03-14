@@ -42,7 +42,6 @@ class RssFeedService private constructor() {
     try {
       val result = service.getFeed(xmlFileURL)
       if (result.code() >= 400) {
-        // TODO : // create an error from error body and return
         println("server error, ${result.code()}, ${result.errorBody()}")
         return null
       } else {
@@ -59,7 +58,6 @@ class RssFeedService private constructor() {
         return rssFeedResponse
       }
     } catch (t: Throwable) {
-      // TODO : create an error from throwable and return it
       println("error, ${t.localizedMessage}")
     }
     return null
