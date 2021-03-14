@@ -242,25 +242,10 @@ class PodcastDetailsFragment : Fragment(), EpisodeListAdapter.EpisodeListAdapter
   interface OnPodcastDetailsListener {
     fun onSubscribe()
     fun onUnsubscribe()
+    fun onShowEpisodePlayer(episodeViewData: PodcastViewModel.EpisodeViewData)
   }
 
   override fun onSelectedEpisode(episodeViewData: PodcastViewModel.EpisodeViewData) {
-    // 1
-    val fragmentActivity = activity as FragmentActivity
-    // 2
-    val controller = MediaControllerCompat.getMediaController(fragmentActivity)
-    // 3
-    if (controller.playbackState != null) {
-      if (controller.playbackState.state == PlaybackStateCompat.STATE_PLAYING) {
-        // 4
-        controller.transportControls.pause()
-      } else {
-        // 5
-        startPlaying(episodeViewData)
-      }
-    } else {
-      // 6
-      startPlaying(episodeViewData)
-    }
+    listener?.onShowEpisodePlayer(episodeViewData)
   }
 }
