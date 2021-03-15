@@ -116,7 +116,6 @@ class PodcastDetailsFragment : Fragment() {
     super.onCreateOptionsMenu(menu, inflater)
     inflater.inflate(R.menu.menu_details, menu)
     menuItem = menu.findItem(R.id.menu_feed_action)
-//    updateMenuItem()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
