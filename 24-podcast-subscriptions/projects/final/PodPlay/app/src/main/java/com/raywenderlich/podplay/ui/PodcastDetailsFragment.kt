@@ -94,6 +94,10 @@ class PodcastDetailsFragment : Fragment() {
         // 3
         episodeListAdapter = EpisodeListAdapter(viewData.episodes)
         databinding.episodeRecyclerView.adapter = episodeListAdapter
+
+        menuItem?.title = if (viewData.subscribed == true)
+          getString(R.string.unsubscribe) else getString(R.string.subscribe)
+
       }
     })
   }
@@ -112,7 +116,7 @@ class PodcastDetailsFragment : Fragment() {
     super.onCreateOptionsMenu(menu, inflater)
     inflater.inflate(R.menu.menu_details, menu)
     menuItem = menu.findItem(R.id.menu_feed_action)
-    updateMenuItem()
+//    updateMenuItem()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -130,14 +134,6 @@ class PodcastDetailsFragment : Fragment() {
       else ->
         super.onOptionsItemSelected(item)
     }
-  }
-
-  private fun updateMenuItem() {
-    // 1
-    val viewData = podcastViewModel.podcastLiveData
-    // 2
-    menuItem?.title = if (viewData.value?.subscribed == true)
-      getString(R.string.unsubscribe) else getString(R.string.subscribe)
   }
 
   interface OnPodcastDetailsListener {
