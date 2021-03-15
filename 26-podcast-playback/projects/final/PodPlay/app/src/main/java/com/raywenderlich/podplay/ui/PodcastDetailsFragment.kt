@@ -110,6 +110,10 @@ class PodcastDetailsFragment : Fragment(), EpisodeListAdapter.EpisodeListAdapter
         // 3
         episodeListAdapter = EpisodeListAdapter(viewData.episodes, this)
         databinding.episodeRecyclerView.adapter = episodeListAdapter
+
+        menuItem?.title = if (viewData.subscribed)
+          getString(R.string.unsubscribe) else getString(R.string.subscribe)
+
       }
     })
   }
@@ -128,7 +132,6 @@ class PodcastDetailsFragment : Fragment(), EpisodeListAdapter.EpisodeListAdapter
     super.onCreateOptionsMenu(menu, inflater)
     inflater.inflate(R.menu.menu_details, menu)
     menuItem = menu.findItem(R.id.menu_feed_action)
-    updateMenuItem()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -178,12 +181,6 @@ class PodcastDetailsFragment : Fragment(), EpisodeListAdapter.EpisodeListAdapter
     activity?.let { activity ->
       Glide.with(activity).load(viewData.value?.imageUrl).into(databinding.feedImageView)
     }
-  }
-
-  private fun updateMenuItem() {
-    val viewData = podcastViewModel.podcastLiveData
-    menuItem?.title = if (viewData.value?.subscribed == true) getString(R.string.unsubscribe)
-    else getString(R.string.subscribe)
   }
 
   private fun registerMediaController(token: MediaSessionCompat.Token) {
