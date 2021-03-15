@@ -56,7 +56,7 @@ class Converters {
 }
 
 // 1
-@Database(entities = arrayOf(Podcast::class, Episode::class), version = 1)
+@Database(entities = [Podcast::class, Episode::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class PodPlayDatabase : RoomDatabase() {
   // 2
@@ -68,7 +68,7 @@ abstract class PodPlayDatabase : RoomDatabase() {
 
     override fun onCreate(db: SupportSQLiteDatabase) {
       super.onCreate(db)
-      INSTANCE?.let { database ->
+      INSTANCE?.let {
         scope.launch {
         }
       }
