@@ -42,7 +42,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.viewModelScope
@@ -129,15 +128,11 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
 
 
   override fun onShowDetails(podcastSummaryViewData: SearchViewModel.PodcastSummaryViewData) {
-    val feedUrl = podcastSummaryViewData.feedUrl ?: return
+    podcastSummaryViewData.feedUrl ?: return
     showProgressBar()
-    val podcast = podcastViewModel.getPodcast(podcastSummaryViewData)
+    podcastViewModel.getPodcast(podcastSummaryViewData)
     hideProgressBar()
-    if (podcast != null) {
-      showDetailsFragment()
-    } else {
-      showError("Error loading feed $feedUrl")
-    }
+    showDetailsFragment()
   }
 
   private fun scheduleJobs() {
@@ -258,11 +253,6 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
 
   private fun hideProgressBar() {
     databinding.progressBar.visibility = View.INVISIBLE
-  }
-
-  private fun showError(message: String) {
-    AlertDialog.Builder(this).setMessage(message).setPositiveButton(getString(R.string.ok_button),
-        null).create().show()
   }
 
   companion object {
