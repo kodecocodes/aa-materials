@@ -91,16 +91,17 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
     searchMenuItem = menu.findItem(R.id.search_item)
     val searchView = searchMenuItem.actionView as SearchView
 
-    searchMenuItem.setOnActionExpandListener(object: MenuItem.OnActionExpandListener {
+    searchMenuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
       override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
         return true
       }
+
       override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
         showSubscribedPodcasts()
         return true
       }
     })
-    
+
     val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
     searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
 
@@ -123,15 +124,11 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
 
 
   override fun onShowDetails(podcastSummaryViewData: SearchViewModel.PodcastSummaryViewData) {
-    val feedUrl = podcastSummaryViewData.feedUrl ?: return
+    podcastSummaryViewData.feedUrl ?: return
     showProgressBar()
-    val podcast = podcastViewModel.getPodcast(podcastSummaryViewData)
+    podcastViewModel.getPodcast(podcastSummaryViewData)
     hideProgressBar()
-    if (podcast != null) {
-      showDetailsFragment()
-    } else {
-      showError("Error loading feed $feedUrl")
-    }
+    showDetailsFragment()
   }
 
   private fun showSubscribedPodcasts() {
