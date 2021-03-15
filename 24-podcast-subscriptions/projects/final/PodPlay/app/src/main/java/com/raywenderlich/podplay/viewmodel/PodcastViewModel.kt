@@ -55,9 +55,9 @@ class PodcastViewModel(application: Application) : AndroidViewModel(application)
 
   private var activePodcast: Podcast? = null
 
-  fun getPodcast(podcastSummaryViewData: PodcastSummaryViewData) {
+  suspend fun getPodcast(podcastSummaryViewData: PodcastSummaryViewData) {
     podcastSummaryViewData.feedUrl?.let { url ->
-      viewModelScope.launch {
+//      viewModelScope.launch {
         podcastRepo?.getPodcast(url)?.let {
           it.feedTitle = podcastSummaryViewData.name ?: ""
           it.imageUrl = podcastSummaryViewData.imageUrl ?: ""
@@ -66,7 +66,7 @@ class PodcastViewModel(application: Application) : AndroidViewModel(application)
         } ?: run {
           _podcastLiveData.value = null
         }
-      }
+//      }
     } ?: run {
       _podcastLiveData.value = null
     }
