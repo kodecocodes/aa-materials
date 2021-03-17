@@ -368,13 +368,14 @@ class EpisodePlayerFragment : Fragment() {
   }
 
   private fun updateControls() {
+    // 1
     databinding.episodeTitleTextView.text = podcastViewModel.activeEpisodeViewData?.title
-
+    // 2
     val htmlDesc = podcastViewModel.activeEpisodeViewData?.description ?: ""
     val descSpan = HtmlUtils.htmlToSpannable(htmlDesc)
     databinding.episodeDescTextView.text = descSpan
     databinding.episodeDescTextView.movementMethod = ScrollingMovementMethod()
-
+    // 3
     val fragmentActivity = activity as FragmentActivity
     Glide.with(fragmentActivity)
         .load(podcastViewModel.podcastLiveData.value?.imageUrl)
