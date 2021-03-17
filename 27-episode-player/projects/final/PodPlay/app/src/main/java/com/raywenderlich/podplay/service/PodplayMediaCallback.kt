@@ -143,11 +143,37 @@ class PodplayMediaCallback(val context: Context,
     }
   }
 
-  private fun setState(state: Int) {
+  private fun setState(state: Int, newSpeed: Float? = null) {
     var position: Long = -1
 
     mediaPlayer?.let {
       position = it.currentPosition.toLong()
+    }
+
+    var speed = 1.0f
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      speed = newSpeed ?: (mediaPlayer?.playbackParams?.speed ?: 1.0f)
+      mediaPlayer?.let { mediaPlayer ->
+        try {
+          mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(speed)
+        }
+        catch (e: Exception) {
+
+          mediaPlayer.reset()
+          mediaUri?.let { mediaUri ->
+            mediaPlayer.setDataSource(context, mediaUri)
+          }
+          mediaPlayer.prepare()
+
+          mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(speed)
+          mediaPlayer.seekTo(position.toInt())
+
+          if (state == PlaybackStateCompat.STATE_PLAYING) {
+            mediaPlayer.start()
+          }
+        }
+      }
     }
 
     val playbackState = PlaybackStateCompat.Builder()
@@ -156,7 +182,7 @@ class PodplayMediaCallback(val context: Context,
                 PlaybackStateCompat.ACTION_STOP or
                 PlaybackStateCompat.ACTION_PLAY_PAUSE or
                 PlaybackStateCompat.ACTION_PAUSE)
-        .setState(state, position, 1.0f)
+        .setState(state, position, speed)
         .build()
 
     mediaSession.setPlaybackState(playbackState)
