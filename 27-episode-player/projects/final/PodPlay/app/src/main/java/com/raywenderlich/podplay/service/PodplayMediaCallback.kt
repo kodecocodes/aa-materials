@@ -228,4 +228,9 @@ class PodplayMediaCallback(val context: Context,
     fun onStopPlaying()
     fun onPausePlaying()
   }
+
+  companion object {
+    const val CMD_CHANGESPEED = "change_speed"
+    const val CMD_EXTRA_SPEED = "speed"
+  }
 }
