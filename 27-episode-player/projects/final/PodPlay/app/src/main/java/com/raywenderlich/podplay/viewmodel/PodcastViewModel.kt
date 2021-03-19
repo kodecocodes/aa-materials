@@ -136,7 +136,8 @@ class PodcastViewModel(application: Application) : AndroidViewModel(application)
 
   private fun episodesToEpisodesView(episodes: List<Episode>): List<EpisodeViewData> {
     return episodes.map {
-      EpisodeViewData(it.guid, it.title, it.description, it.mediaUrl, it.releaseDate, it.duration)
+      val isVideo = it.mimeType.startsWith("video")
+      EpisodeViewData(it.guid, it.title, it.description, it.mediaUrl, it.releaseDate, it.duration, isVideo)
     }
   }
 
