@@ -146,18 +146,18 @@
       android:contentDescription="@string/skip_forward" />
 
     <Button
-        android:id="@+id/speedButton"
-        android:layout_width="54dp"
-        android:layout_height="34dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/transparent"
-        android:text="@string/_1x"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+      android:id="@+id/speedButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="8dp"
+      android:layout_marginTop="5dp"
+      android:background="@android:color/transparent"
+      android:text="@string/_1x"
+      android:textAllCaps="false"
+      android:textColor="@android:color/white"
+      android:textSize="14sp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/currentTimeTextView"
