@@ -228,11 +228,6 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
     databinding.progressBar.visibility = View.INVISIBLE
   }
 
-  private fun showError(message: String) {
-    AlertDialog.Builder(this).setMessage(message).setPositiveButton(getString(R.string.ok_button),
-        null).create().show()
-  }
-
   companion object {
     private const val TAG_DETAILS_FRAGMENT = "DetailsFragment"
   }
