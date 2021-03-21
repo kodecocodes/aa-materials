@@ -103,9 +103,9 @@ class PodplayMediaService : MediaBrowserServiceCompat(), PodplayMediaListener {
   private fun createMediaSession() {
     mediaSession = MediaSessionCompat(this, "PodplayMediaService")
     sessionToken = mediaSession.sessionToken
-    val callBack = PodplayMediaCallback(this, mediaSession)
-    callBack.listener = this
-    mediaSession.setCallback(callBack)
+    val callback = PodplayMediaCallback(this, mediaSession)
+    callback.listener = this
+    mediaSession.setCallback(callback)
   }
 
   private fun getPausePlayActions():
@@ -121,14 +121,11 @@ class PodplayMediaService : MediaBrowserServiceCompat(), PodplayMediaListener {
     return Pair(pauseAction, playAction)
   }
 
-  private fun isPlaying(): Boolean {
-    return if (mediaSession.controller.playbackState != null) {
-      mediaSession.controller.playbackState.state ==
+  private fun isPlaying() =
+      mediaSession.controller.playbackState != null &&
+          mediaSession.controller.playbackState.state ==
           PlaybackStateCompat.STATE_PLAYING
-    } else {
-      false
-    }
-  }
+
 
   private fun getNotificationIntent(): PendingIntent {
     val openActivityIntent = Intent(this, PodcastActivity::class.java)

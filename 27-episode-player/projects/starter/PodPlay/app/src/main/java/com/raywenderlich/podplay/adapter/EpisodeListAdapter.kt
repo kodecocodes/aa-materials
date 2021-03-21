@@ -52,9 +52,10 @@ class EpisodeListAdapter(
     fun onSelectedEpisode(episodeViewData: PodcastViewModel.EpisodeViewData)
   }
 
-  inner class ViewHolder(databinding: EpisodeItemBinding, val episodeListAdapterListener:
-  EpisodeListAdapterListener) : RecyclerView.ViewHolder(databinding.root) {
-
+  inner class ViewHolder(
+      databinding: EpisodeItemBinding,
+      val episodeListAdapterListener: EpisodeListAdapterListener
+  ) : RecyclerView.ViewHolder(databinding.root) {
     init {
       databinding.root.setOnClickListener {
         episodeViewData?.let {
