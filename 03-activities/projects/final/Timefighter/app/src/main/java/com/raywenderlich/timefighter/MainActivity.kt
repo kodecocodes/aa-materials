@@ -1,11 +1,11 @@
 package com.raywenderlich.timefighter
 
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
     score++
 
-    val newScore = "Your Score: $score"
+    val newScore = getString(R.string.your_score, score)
     gameScoreTextView.text = newScore
   }
 
