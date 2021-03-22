@@ -287,3 +287,4 @@ DerivedData/
 
 ## Gcc Patch
 /*.gcno
+04-debugging/projects/starter/timefighter/.idea
