@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.raywenderlich.listmaker.R
 import com.raywenderlich.listmaker.databinding.ListDetailFragmentBinding
-import com.raywenderlich.listmaker.databinding.MainFragmentBinding
+import com.raywenderlich.listmaker.models.TaskList
 
 class ListDetailFragment : Fragment() {
 
@@ -21,8 +21,10 @@ class ListDetailFragment : Fragment() {
 
   private lateinit var viewModel: ListDetailViewModel
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-
+  override fun onCreateView(
+      inflater: LayoutInflater, container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
     // 1
     binding = ListDetailFragmentBinding.inflate(inflater, container, false)
 
@@ -34,12 +36,12 @@ class ListDetailFragment : Fragment() {
     super.onActivityCreated(savedInstanceState)
     viewModel = ViewModelProvider(requireActivity()).get(ListDetailViewModel::class.java)
 
-    binding.listItemsRecyclerview.adapter = ListItemsRecyclerViewAdapter(viewModel.list)
+    val recyclerAdapter = ListItemsRecyclerViewAdapter(viewModel.list)
+    binding.listItemsRecyclerview.adapter = recyclerAdapter
     binding.listItemsRecyclerview.layoutManager = LinearLayoutManager(requireContext())
 
     viewModel.onTaskAdded = {
-      val adapter = binding.listItemsRecyclerview.adapter as ListItemsRecyclerViewAdapter
-      adapter.tasksUpdated()
+      recyclerAdapter.notifyDataSetChanged()
     }
   }
 }

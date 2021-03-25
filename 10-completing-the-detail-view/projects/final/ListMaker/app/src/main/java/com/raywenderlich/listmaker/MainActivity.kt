@@ -27,10 +27,10 @@ class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionLi
     super.onCreate(savedInstanceState)
 
     viewModel = ViewModelProvider(
-            this,
-            MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(this))
+        this,
+        MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(this))
     )
-            .get(MainViewModel::class.java)
+      .get(MainViewModel::class.java)
 
     binding = MainActivityBinding.inflate(layoutInflater)
     val view = binding.root
@@ -40,8 +40,8 @@ class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionLi
     if (savedInstanceState == null) {
       val mainFragment = MainFragment.newInstance(this)
       supportFragmentManager.beginTransaction()
-              .replace(R.id.detail_container, mainFragment)
-              .commitNow()
+        .replace(R.id.detail_container, mainFragment)
+        .commitNow()
     }
 
     binding.fabButton.setOnClickListener {
@@ -82,7 +82,8 @@ class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionLi
     showListDetail(list)
   }
 
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data:
+  Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
     // 1
     if (requestCode == LIST_DETAIL_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
