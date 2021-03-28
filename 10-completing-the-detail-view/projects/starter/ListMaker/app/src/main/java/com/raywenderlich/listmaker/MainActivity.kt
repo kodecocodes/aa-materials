@@ -3,81 +3,70 @@ package com.raywenderlich.listmaker
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
-import android.view.Menu
-import android.view.MenuItem
+import android.util.Log
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_main.*
+import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
+import com.raywenderlich.listmaker.databinding.MainActivityBinding
+import com.raywenderlich.listmaker.models.TaskList
+import com.raywenderlich.listmaker.ui.detail.ListDetailActivity
+import com.raywenderlich.listmaker.ui.main.MainFragment
+import com.raywenderlich.listmaker.ui.main.MainViewModel
+import com.raywenderlich.listmaker.ui.main.MainViewModelFactory
 
-class MainActivity : AppCompatActivity(), ListSelectionRecyclerViewAdapter.ListSelectionRecyclerViewClickListener {
+class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionListener {
 
-  val listDataManager: ListDataManager = ListDataManager(this)
+  private lateinit var binding: MainActivityBinding
 
-  lateinit var listsRecyclerView: RecyclerView
+  private lateinit var viewModel: MainViewModel
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
-    setSupportActionBar(toolbar)
 
-    fab.setOnClickListener {
-      showCreateListDialog()
+    viewModel = ViewModelProvider(
+        this,
+        MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(this))
+    )
+      .get(MainViewModel::class.java)
+
+    binding = MainActivityBinding.inflate(layoutInflater)
+    val view = binding.root
+    setContentView(view)
+    Log.i("MainActivity", viewModel.toString())
+
+    if (savedInstanceState == null) {
+      val mainFragment = MainFragment.newInstance(this)
+      supportFragmentManager.beginTransaction()
+        .replace(R.id.container, mainFragment)
+        .commitNow()
     }
 
-    // 1
-    val lists = listDataManager.readLists()
-    listsRecyclerView = findViewById(R.id.lists_recyclerview)
-    listsRecyclerView.layoutManager = LinearLayoutManager(this)
-
-    // 2
-    listsRecyclerView.adapter = ListSelectionRecyclerViewAdapter(lists, this)
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    menuInflater.inflate(R.menu.menu_main, menu)
-    return true
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
-    return when (item.itemId) {
-      R.id.action_settings -> true
-      else -> super.onOptionsItemSelected(item)
+    binding.fabButton.setOnClickListener {
+      showCreateListDialog()
     }
   }
 
   private fun showCreateListDialog() {
-    // 1
+
     val dialogTitle = getString(R.string.name_of_list)
     val positiveButtonTitle = getString(R.string.create_list)
 
-    // 2
     val builder = AlertDialog.Builder(this)
     val listTitleEditText = EditText(this)
     listTitleEditText.inputType = InputType.TYPE_CLASS_TEXT
 
     builder.setTitle(dialogTitle)
     builder.setView(listTitleEditText)
-
-    // 3
     builder.setPositiveButton(positiveButtonTitle) { dialog, _ ->
-      val list = TaskList(listTitleEditText.text.toString())
-      listDataManager.saveList(list)
-
-      val recyclerAdapter = listsRecyclerView.adapter as ListSelectionRecyclerViewAdapter
-      recyclerAdapter.addList(list)
-
       dialog.dismiss()
-      showListDetail(list)
+
+      val taskList = TaskList(listTitleEditText.text.toString())
+      viewModel.saveList(taskList)
+      showListDetail(taskList)
     }
 
-    // 4
     builder.create().show()
   }
 
@@ -90,7 +79,7 @@ class MainActivity : AppCompatActivity(), ListSelectionRecyclerViewAdapter.ListS
     startActivity(listDetailIntent)
   }
 
-  override fun listItemClicked(list: TaskList) {
+  override fun listItemTapped(list: TaskList) {
     showListDetail(list)
   }
 
