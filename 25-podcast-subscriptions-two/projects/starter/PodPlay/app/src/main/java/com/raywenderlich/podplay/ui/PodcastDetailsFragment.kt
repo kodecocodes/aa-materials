@@ -41,12 +41,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.raywenderlich.podplay.R
 import com.raywenderlich.podplay.adapter.EpisodeListAdapter
+import com.raywenderlich.podplay.databinding.FragmentPodcastDetailsBinding
 import com.raywenderlich.podplay.viewmodel.PodcastViewModel
-import kotlinx.android.synthetic.main.fragment_podcast_details.*
 
 class PodcastDetailsFragment : Fragment() {
 
   private val podcastViewModel: PodcastViewModel by activityViewModels()
+  private lateinit var databinding: FragmentPodcastDetailsBinding
   private lateinit var episodeListAdapter: EpisodeListAdapter
   private var listener: OnPodcastDetailsListener? = null
   private var menuItem: MenuItem? = null
@@ -63,39 +64,42 @@ class PodcastDetailsFragment : Fragment() {
   }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                            savedInstanceState: Bundle?): View? {
-    return inflater.inflate(R.layout.fragment_podcast_details, container, false)
+                            savedInstanceState: Bundle?): View {
+    databinding = FragmentPodcastDetailsBinding.inflate(inflater, container, false)
+    return databinding.root
   }
 
-  override fun onActivityCreated(savedInstanceState: Bundle?) {
-    super.onActivityCreated(savedInstanceState)
-    setupControls()
-    updateControls()
-  }
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    super.onCreateOptionsMenu(menu, inflater)
-    inflater.inflate(R.menu.menu_details, menu)
-    menuItem = menu.findItem(R.id.menu_feed_action)
-    updateMenuItem()
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    when (item.itemId) {
-      R.id.menu_feed_action -> {
-        podcastViewModel.activePodcastViewData?.feedUrl?.let {
-
-          if (podcastViewModel.activePodcastViewData?.subscribed == true) {
-            listener?.onUnsubscribe()
-          } else {
-            listener?.onSubscribe()
-          }
+    podcastViewModel.podcastLiveData.observe(viewLifecycleOwner, { viewData ->
+      if (viewData != null) {
+        databinding.feedTitleTextView.text = viewData.feedTitle
+        databinding.feedDescTextView.text = viewData.feedDesc
+        activity?.let { activity ->
+          Glide.with(activity).load(viewData.imageUrl).into(databinding.feedImageView)
         }
-        return true
+
+        // 1
+        databinding.feedDescTextView.movementMethod = ScrollingMovementMethod()
+        // 2
+        databinding.episodeRecyclerView.setHasFixedSize(true)
+
+        val layoutManager = LinearLayoutManager(activity)
+        databinding.episodeRecyclerView.layoutManager = layoutManager
+
+        val dividerItemDecoration = DividerItemDecoration(
+            databinding.episodeRecyclerView.context, layoutManager.orientation)
+        databinding.episodeRecyclerView.addItemDecoration(dividerItemDecoration)
+        // 3
+        episodeListAdapter = EpisodeListAdapter(viewData.episodes)
+        databinding.episodeRecyclerView.adapter = episodeListAdapter
+
+        menuItem?.title = if (viewData.subscribed == true)
+          getString(R.string.unsubscribe) else getString(R.string.subscribe)
+
       }
-      else ->
-        return super.onOptionsItemSelected(item)
-    }
+    })
   }
 
   override fun onAttach(context: Context) {
@@ -103,41 +107,32 @@ class PodcastDetailsFragment : Fragment() {
     if (context is OnPodcastDetailsListener) {
       listener = context
     } else {
-      throw RuntimeException(context.toString() + " must implement OnPodcastDetailsListener")
+      throw RuntimeException(context.toString() +
+          " must implement OnPodcastDetailsListener")
     }
   }
 
-
-  private fun setupControls() {
-
-    feedDescTextView.movementMethod = ScrollingMovementMethod()
-
-    episodeRecyclerView.setHasFixedSize(true)
-
-    val layoutManager = LinearLayoutManager(activity)
-    episodeRecyclerView.layoutManager = layoutManager
-
-    val dividerItemDecoration = DividerItemDecoration(
-            episodeRecyclerView.context, layoutManager.orientation)
-    episodeRecyclerView.addItemDecoration(dividerItemDecoration)
-
-    episodeListAdapter = EpisodeListAdapter(podcastViewModel.activePodcastViewData?.episodes)
-    episodeRecyclerView.adapter = episodeListAdapter
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    super.onCreateOptionsMenu(menu, inflater)
+    inflater.inflate(R.menu.menu_details, menu)
+    menuItem = menu.findItem(R.id.menu_feed_action)
   }
 
-  private fun updateControls() {
-    val viewData = podcastViewModel.activePodcastViewData ?: return
-    feedTitleTextView.text = viewData.feedTitle
-    feedDescTextView.text = viewData.feedDesc
-    activity?.let { activity ->
-      Glide.with(activity).load(viewData.imageUrl).into(feedImageView)
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    return when (item.itemId) {
+      R.id.menu_feed_action -> {
+        podcastViewModel.podcastLiveData.value?.subscribed.let {
+          if (it == true) {
+            listener?.onUnsubscribe()
+          } else {
+            listener?.onSubscribe()
+          }
+        }
+        true
+      }
+      else ->
+        super.onOptionsItemSelected(item)
     }
-  }
-
-  private fun updateMenuItem() {
-    val viewData = podcastViewModel.activePodcastViewData ?: return
-    menuItem?.title = if (viewData.subscribed) getString(R.string.unsubscribe)
-        else getString(R.string.subscribe)
   }
 
   interface OnPodcastDetailsListener {

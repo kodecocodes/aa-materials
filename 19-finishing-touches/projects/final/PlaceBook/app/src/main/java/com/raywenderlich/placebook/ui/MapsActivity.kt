@@ -37,14 +37,15 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.location.Location
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.WindowManager
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.lifecycle.Observer
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
@@ -67,10 +68,8 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.raywenderlich.placebook.R
 import com.raywenderlich.placebook.adapter.BookmarkInfoWindowAdapter
 import com.raywenderlich.placebook.adapter.BookmarkListAdapter
+import com.raywenderlich.placebook.databinding.ActivityMapsBinding
 import com.raywenderlich.placebook.viewmodel.MapsViewModel
-import kotlinx.android.synthetic.main.activity_maps.*
-import kotlinx.android.synthetic.main.drawer_view_maps.*
-import kotlinx.android.synthetic.main.main_view_maps.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -82,10 +81,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   private val mapsViewModel by viewModels<MapsViewModel>()
   private lateinit var bookmarkListAdapter: BookmarkListAdapter
   private var markers = HashMap<Long, Marker>()
+  private lateinit var databinding: ActivityMapsBinding
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_maps)
+    databinding = ActivityMapsBinding.inflate(layoutInflater)
+    setContentView(databinding.root)
 
     val mapFragment = supportFragmentManager
         .findFragmentById(R.id.map) as SupportMapFragment
@@ -99,14 +100,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   override fun onMapReady(googleMap: GoogleMap) {
     map = googleMap
-
     setupMapListeners()
     createBookmarkObserver()
     getCurrentLocation()
   }
 
-  override fun onActivityResult(requestCode: Int, resultCode: Int,
-                                data: Intent?) {
+  override fun onActivityResult(
+      requestCode: Int,
+      resultCode: Int,
+      data: Intent?
+  ) {
     super.onActivityResult(requestCode, resultCode, data)
     // 1
     when (requestCode) {
@@ -128,14 +131,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun setupPlacesClient() {
-    Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
+    Places.initialize(applicationContext, getString(R.string.google_maps_key));
     placesClient = Places.createClient(this);
   }
 
   private fun setupToolbar() {
-    setSupportActionBar(toolbar)
+    setSupportActionBar(databinding.mainMapView.toolbar)
     val toggle = ActionBarDrawerToggle(
-        this,  drawerLayout, toolbar,
+        this, databinding.drawerLayout, databinding.mainMapView.toolbar,
         R.string.open_drawer, R.string.close_drawer)
     toggle.syncState()
   }
@@ -148,7 +151,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     map.setOnInfoWindowClickListener {
       handleInfoWindowClick(it)
     }
-    fab.setOnClickListener {
+    databinding.mainMapView.fab.setOnClickListener {
       searchAtCurrentLocation()
     }
     map.setOnMapLongClickListener { latLng ->
@@ -161,8 +164,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     displayPoiGetPlaceStep(pointOfInterest)
   }
 
-  private fun displayPoiGetPlaceStep(pointOfInterest:
-                                     PointOfInterest) {
+  private fun displayPoiGetPlaceStep(pointOfInterest: PointOfInterest) {
     val placeId = pointOfInterest.placeId
 
     val placeFields = listOf(Place.Field.ID,
@@ -194,7 +196,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }  
 
   private fun displayPoiGetPhotoStep(place: Place) {
-    val photoMetadata = place.getPhotoMetadatas()?.get(0)
+    val photoMetadata = place.photoMetadatas?.get(0)
     if (photoMetadata == null) {
       displayPoiDisplayStep(place, null)
       return
@@ -225,10 +227,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     marker?.tag = PlaceInfo(place, photo)
     marker?.showInfoWindow()
   }
-  
-  override fun onRequestPermissionsResult(requestCode: Int,
-                                          permissions: Array<String>,
-                                          grantResults: IntArray) {
+
+  override fun onRequestPermissionsResult(
+      requestCode: Int,
+      permissions: Array<String>,
+      grantResults: IntArray
+  ) {
     if (requestCode == REQUEST_LOCATION) {
       if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         getCurrentLocation()
@@ -250,19 +254,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private fun handleInfoWindowClick(marker: Marker) {
     when (marker.tag) {
-      is MapsActivity.PlaceInfo -> {
+      is PlaceInfo -> {
         val placeInfo = (marker.tag as PlaceInfo)
-        if (placeInfo.place != null) {
+        if (placeInfo.place != null && placeInfo.image != null) {
           GlobalScope.launch {
-            mapsViewModel.addBookmarkFromPlace(placeInfo.place,
-                placeInfo.image)
+            mapsViewModel.addBookmarkFromPlace(placeInfo.place, placeInfo.image)
           }
         }
         marker.remove()
       }
       is MapsViewModel.BookmarkView -> {
-        val bookmarkMarkerView = (marker.tag as
-            MapsViewModel.BookmarkView)
+        val bookmarkMarkerView = (marker.tag as MapsViewModel.BookmarkView)
         marker.hideInfoWindow()
         bookmarkMarkerView.id?.let {
           startBookmarkDetails(it)
@@ -271,29 +273,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
   }
 
- private fun createBookmarkObserver() {
-    mapsViewModel.getBookmarkViews()?.observe(
-        this, Observer<List<MapsViewModel.BookmarkView>> {
-
-          map.clear()
-          markers.clear()
-
-          it?.let {
-            displayAllBookmarks(it)
-            bookmarkListAdapter.setBookmarkData(it)
-          }
-        })
+  private fun createBookmarkObserver() {
+    mapsViewModel.getBookmarkViews()?.observe(this, {
+      map.clear()
+      markers.clear()
+      it?.let {
+        displayAllBookmarks(it)
+        bookmarkListAdapter.setBookmarkData(it)
+      }
+    })
   }
 
-  private fun displayAllBookmarks(
-      bookmarks: List<MapsViewModel.BookmarkView>) {
-    for (bookmark in bookmarks) {
-      addPlaceMarker(bookmark)
-    }
+  private fun displayAllBookmarks(bookmarks: List<MapsViewModel.BookmarkView>) {
+    bookmarks.forEach { addPlaceMarker(it) }
   }
 
-  private fun addPlaceMarker(
-      bookmark: MapsViewModel.BookmarkView): Marker? {
+  private fun addPlaceMarker(bookmark: MapsViewModel.BookmarkView): Marker? {
     val marker = map.addMarker(MarkerOptions()
         .position(bookmark.location)
         .title(bookmark.name)
@@ -313,7 +308,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
       requestLocationPermissions()
     } else {
       map.isMyLocationEnabled = true
-
       fusedLocationClient.lastLocation.addOnCompleteListener {
         val location = it.result
         if (location != null) {
@@ -335,20 +329,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private fun setupNavigationDrawer() {
     val layoutManager = LinearLayoutManager(this)
-    bookmarkRecyclerView.layoutManager = layoutManager
+    databinding.drawerViewMaps.bookmarkRecyclerView.layoutManager = layoutManager
     bookmarkListAdapter = BookmarkListAdapter(null, this)
-    bookmarkRecyclerView.adapter = bookmarkListAdapter
+    databinding.drawerViewMaps.bookmarkRecyclerView.adapter = bookmarkListAdapter
   }
 
   private fun updateMapToLocation(location: Location) {
     val latLng = LatLng(location.latitude, location.longitude)
-    map.animateCamera(
-        CameraUpdateFactory.newLatLngZoom(latLng, 16.0f))
+    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.0f))
   }
 
   fun moveToBookmark(bookmark: MapsViewModel.BookmarkView) {
 
-    drawerLayout.closeDrawer(drawerView)
+    databinding.drawerLayout.closeDrawer(databinding.drawerViewMaps.drawerView)
 
     val marker = markers[bookmark.id]
 
@@ -379,9 +372,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
           .build(this)
       startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
     } catch (e: GooglePlayServicesRepairableException) {
-      //TODO: Handle exception
+      Log.e("MAPS", "searchAtCurrentLocation",e )
+      Toast.makeText(this, "Problems Searching", Toast.LENGTH_LONG).show()
     } catch (e: GooglePlayServicesNotAvailableException) {
-      //TODO: Handle exception
+      Log.e("MAPS", "searchAtCurrentLocation",e )
+      Toast.makeText(this, "Problems Searching. Google Play Not available", Toast.LENGTH_LONG).show()
     }
   }
 
@@ -405,18 +400,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   private fun showProgress() {
-    progressBar.visibility = ProgressBar.VISIBLE
+    databinding.mainMapView.progressBar.visibility = ProgressBar.VISIBLE
     disableUserInteraction()
   }
 
   private fun hideProgress() {
-    progressBar.visibility = ProgressBar.GONE
+    databinding.mainMapView.progressBar.visibility = ProgressBar.GONE
     enableUserInteraction()
   }
 
   companion object {
-    const val EXTRA_BOOKMARK_ID =
-        "com.raywenderlich.placebook.EXTRA_BOOKMARK_ID"
+    const val EXTRA_BOOKMARK_ID = "com.raywenderlich.placebook.EXTRA_BOOKMARK_ID"
     private const val REQUEST_LOCATION = 1
     private const val TAG = "MapsActivity"
     private const val AUTOCOMPLETE_REQUEST_CODE = 2

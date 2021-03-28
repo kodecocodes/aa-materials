@@ -1,138 +1,226 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  >
+  <data>
+    <variable
+      name="bookmarkDetailsView"
+      type="com.raywenderlich.placebook.viewmodel.BookmarkDetailsViewModel.BookmarkDetailsView" />
+  </data>
 
-<FrameLayout
+  <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-  <LinearLayout
-      android:orientation="vertical"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent">
+    android:layout_height="match_parent">
+
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.AppBarOverlay">
-      <androidx.appcompat.widget.Toolbar
-          android:id="@+id/toolbar"
+      android:id="@+id/appbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:theme="@style/AppTheme.AppBarOverlay">
+
+        <com.google.android.material.appbar.MaterialToolbar
           android:layout_width="match_parent"
-          android:layout_height="?attr/actionBarSize"
-          app:popupTheme="@style/AppTheme.PopupOverlay"/>
-    </com.google.android.material.appbar.AppBarLayout>
-    <ScrollView
+          android:layout_height="match_parent"
+          app:contentScrim="?attr/colorPrimary"
+          app:layout_scrollFlags="scroll|exitUntilCollapsed"
+          app:toolbarId="@+id/toolbar">
+
+
+          <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+        </com.google.android.material.appbar.MaterialToolbar>
+      </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+      <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-      <LinearLayout
-          android:layout_width="match_parent"
+
+        <androidx.appcompat.widget.AppCompatImageView
+          android:id="@+id/imageViewPlace"
+          android:layout_width="0dp"
           android:layout_height="wrap_content"
-          android:orientation="vertical">
+          android:adjustViewBounds="true"
+          android:maxHeight="300dp"
+          android:scaleType="fitCenter"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent"
+          app:srcCompat="@drawable/default_photo" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+          android:id="@+id/textViewName"
+          style="@style/BookmarkLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/name"
+          android:layout_marginStart="8dp"
+          android:layout_marginTop="16dp"
+          app:layout_constraintEnd_toStartOf="@+id/barrier1"
+          app:layout_constraintHorizontal_bias="0.0"
+          app:layout_constraintBaseline_toBaselineOf="@+id/editTextName"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@+id/imageViewPlace" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+          android:id="@+id/textViewCategoryLabel"
+          style="@style/BookmarkLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/category"
+          android:layout_marginStart="8dp"
+          app:layout_constraintEnd_toStartOf="@+id/barrier1"
+          app:layout_constraintHorizontal_bias="0.0"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintBottom_toBottomOf="@+id/spinnerCategory"
+          app:layout_constraintTop_toTopOf="@+id/spinnerCategory"
+          />
+
+        <androidx.appcompat.widget.AppCompatTextView
+          android:id="@+id/textViewNotes"
+          style="@style/BookmarkLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:inputType="textMultiLine"
+          android:text="@string/notes"
+          android:layout_marginStart="8dp"
+          app:layout_constraintEnd_toStartOf="@+id/barrier1"
+          app:layout_constraintHorizontal_bias="0.0"
+          app:layout_constraintBaseline_toBaselineOf="@+id/editTextNotes"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@+id/textViewCategoryLabel" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+          android:id="@+id/textViewPhone"
+          style="@style/BookmarkLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="8dp"
+          android:text="@string/phone"
+          app:layout_constraintBaseline_toBaselineOf="@+id/editTextPhone"
+          app:layout_constraintEnd_toStartOf="@+id/barrier1"
+          app:layout_constraintHorizontal_bias="0.0"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@+id/textViewNotes" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+          android:id="@+id/textViewAddress"
+          style="@style/BookmarkLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/address"
+          android:layout_marginStart="8dp"
+          app:layout_constraintEnd_toStartOf="@+id/barrier1"
+          app:layout_constraintHorizontal_bias="0.0"
+          app:layout_constraintBaseline_toBaselineOf="@+id/editTextAddress"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@+id/textViewPhone"
+          />
+
+        <androidx.constraintlayout.widget.Barrier
+          android:id="@+id/barrier1"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          app:barrierDirection="start"
+          app:constraint_referenced_ids="editTextName, editTextNotes,editTextPhone, editTextAddress,spinnerCategory" />
+
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/editTextName"
+          style="@style/BookmarkEditText"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:hint="@string/name"
+          android:text="@{bookmarkDetailsView.name}"
+          android:layout_marginTop="16dp"
+          android:layout_marginStart="16dp"
+          android:layout_marginEnd="8dp"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@+id/barrier1"
+          app:layout_constraintTop_toBottomOf="@+id/imageViewPlace" />
+
         <ImageView
-            android:id="@+id/imageViewPlace"
-            android:layout_margin="0dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxHeight="300dp"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"
-            app:srcCompat="@drawable/default_photo"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
-          <TextView
-              android:id="@+id/textViewName"
-              style="@style/BookmarkLabel"
-              android:text="Name"/>
-          <EditText
-              android:id="@+id/editTextName"
-              style="@style/BookmarkEditText"
-              android:hint="Name"
-              android:inputType="text"
-              />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-          <TextView
-              android:id="@+id/textViewCategoryLabel"
-              style="@style/BookmarkLabel"
-              android:layout_weight='0.4'
-              android:text="Category"/>
-          <ImageView
-              android:id="@+id/imageViewCategory"
-              android:layout_width="24dp"
-              android:layout_height="24dp"
-              android:src="@drawable/ic_other"
-              android:layout_marginStart="16dp"
-              android:layout_marginLeft="16dp"
-              android:layout_gravity="bottom"
-              />
-          <Spinner
-              android:id="@+id/spinnerCategory"
-              android:layout_width="0dp"
-              android:layout_height="wrap_content"
-              android:layout_weight='1.4'
-              android:layout_marginStart="8dp"
-              android:layout_marginEnd="8dp"
-              android:layout_marginTop="16dp"
-              />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-          <TextView
-              android:id="@+id/textViewNotes"
-              style="@style/BookmarkLabel"
-              android:text="Notes"/>
-          <EditText
-              android:id="@+id/editTextNotes"
-              style="@style/BookmarkEditText"
-              android:hint="Enter notes"
-              android:inputType="textMultiLine"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-          <TextView
-              android:id="@+id/textViewPhone"
-              style="@style/BookmarkLabel"
-              android:text="Phone"/>
-          <EditText
-              android:id="@+id/editTextPhone"
-              style="@style/BookmarkEditText"
-              android:hint="Phone number"
-              android:inputType="phone"
-              />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-          <TextView
-              android:id="@+id/textViewAddress"
-              style="@style/BookmarkLabel"
-              android:text="Address"/>
-          <EditText
-              android:id="@+id/editTextAddress"
-              style="@style/BookmarkEditText"
-              android:hint="Address"
-              android:inputType="textMultiLine"
-              />
-        </LinearLayout>
-      </LinearLayout>
-    </ScrollView>
-  </LinearLayout>
-  <com.google.android.material.floatingactionbutton.FloatingActionButton
+          android:id="@+id/imageViewCategory"
+          android:layout_width="24dp"
+          android:layout_height="24dp"
+          android:src="@drawable/ic_other"
+          android:layout_marginStart="16dp"
+          app:layout_constraintBottom_toBottomOf="@+id/spinnerCategory"
+          app:layout_constraintStart_toEndOf="@+id/barrier1"
+          app:layout_constraintTop_toTopOf="@+id/spinnerCategory"
+          />
+        <Spinner
+          android:id="@+id/spinnerCategory"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight='1.4'
+          android:layout_marginTop="16dp"
+          android:layout_marginStart="8dp"
+          android:layout_marginEnd="8dp"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@+id/imageViewCategory"
+          app:layout_constraintTop_toBottomOf="@+id/editTextName"
+          />
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/editTextNotes"
+          style="@style/BookmarkEditText"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:hint="@string/enter_notes"
+          android:text="@{bookmarkDetailsView.notes}"
+          android:layout_marginTop="16dp"
+          android:layout_marginStart="16dp"
+          android:layout_marginEnd="8dp"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@+id/barrier1"
+          app:layout_constraintTop_toBottomOf="@+id/spinnerCategory" />
+
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/editTextPhone"
+          style="@style/BookmarkEditText"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:hint="@string/phone_number"
+          android:text="@{bookmarkDetailsView.phone}"
+          android:layout_marginTop="16dp"
+          android:layout_marginStart="16dp"
+          android:layout_marginEnd="8dp"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@+id/barrier1"
+          app:layout_constraintTop_toBottomOf="@+id/editTextNotes" />
+
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/editTextAddress"
+          style="@style/BookmarkEditText"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:hint="@string/address"
+          android:inputType="textMultiLine"
+          android:text="@{bookmarkDetailsView.address}"
+          android:layout_marginTop="16dp"
+          android:layout_marginStart="16dp"
+          android:layout_marginEnd="8dp"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@+id/barrier1"
+          app:layout_constraintTop_toBottomOf="@+id/editTextPhone"
+          />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+ <com.google.android.material.floatingactionbutton.FloatingActionButton
       android:id="@+id/fab"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_margin="16dp"
       android:layout_gravity="bottom|end"
       app:srcCompat="@android:drawable/ic_dialog_email"/>
-</FrameLayout>
+  </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

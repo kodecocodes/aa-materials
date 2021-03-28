@@ -42,11 +42,9 @@ import com.raywenderlich.placebook.util.ImageUtils
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class BookmarkDetailsViewModel(application: Application) :
-    AndroidViewModel(application) {
+class BookmarkDetailsViewModel(application: Application) : AndroidViewModel(application) {
 
-  private var bookmarkRepo: BookmarkRepo =
-      BookmarkRepo(getApplication())
+  private var bookmarkRepo: BookmarkRepo = BookmarkRepo(getApplication())
   private var bookmarkDetailsView: LiveData<BookmarkDetailsView>? = null
 
   fun getCategories(): List<String> {
@@ -61,7 +59,6 @@ class BookmarkDetailsViewModel(application: Application) :
   }
 
   fun updateBookmark(bookmarkDetailsView: BookmarkDetailsView) {
-
     GlobalScope.launch {
       val bookmark = bookmarkViewToBookmark(bookmarkDetailsView)
       bookmark?.let { bookmarkRepo.updateBookmark(it) }
