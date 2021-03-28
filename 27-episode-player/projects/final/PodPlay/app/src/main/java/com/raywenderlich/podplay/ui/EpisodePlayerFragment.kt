@@ -1,31 +1,35 @@
 /*
- * Copyright (c) 2020 Razeware LLC
+ * Copyright (c) 2021 Razeware LLC
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *   of this software and associated documentation files (the "Software"), to deal
+ *   in the Software without restriction, including without limitation the rights
+ *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *   copies of the Software, and to permit persons to whom the Software is
+ *   furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ *  The above copyright notice and this permission notice shall be included in
+ *  all copies or substantial portions of the Software.
  *
- * Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
- * distribute, sublicense, create a derivative work, and/or sell copies of the
- * Software in any work that is designed, intended, or marketed for pedagogical or
- * instructional purposes related to programming, coding, application development,
- * or information technology.  Permission for such use, copying, modification,
- * merger, publication, distribution, sublicensing, creation of derivative works,
- * or sale is expressly withheld.
+ *   Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
+ *   distribute, sublicense, create a derivative work, and/or sell copies of the
+ *   Software in any work that is designed, intended, or marketed for pedagogical or
+ *   instructional purposes related to programming, coding, application development,
+ *   or information technology.  Permission for such use, copying, modification,
+ *   merger, publication, distribution, sublicensing, creation of derivative works,
+ *   or sale is expressly withheld.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ *   This project and source code may use libraries or frameworks that are
+ *   released under various Open-Source licenses. Use of those libraries and
+ *   frameworks are governed by their own individual licenses.
+ *
+ *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *   THE SOFTWARE.
  */
 
 package com.raywenderlich.podplay.ui
@@ -34,7 +38,7 @@ import android.animation.ValueAnimator
 import android.content.ComponentName
 import android.content.Context
 import android.graphics.Color
-import android.media.AudioManager
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
@@ -46,7 +50,10 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.text.format.DateUtils
 import android.text.method.ScrollingMovementMethod
-import android.view.*
+import android.view.LayoutInflater
+import android.view.SurfaceHolder
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
@@ -54,16 +61,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
-import com.raywenderlich.podplay.R
+import com.raywenderlich.podplay.databinding.FragmentEpisodePlayerBinding
 import com.raywenderlich.podplay.service.PodplayMediaCallback
 import com.raywenderlich.podplay.service.PodplayMediaCallback.Companion.CMD_CHANGESPEED
 import com.raywenderlich.podplay.service.PodplayMediaCallback.Companion.CMD_EXTRA_SPEED
 import com.raywenderlich.podplay.service.PodplayMediaService
 import com.raywenderlich.podplay.util.HtmlUtils
 import com.raywenderlich.podplay.viewmodel.PodcastViewModel
-import kotlinx.android.synthetic.main.fragment_episode_player.*
+
 
 class EpisodePlayerFragment : Fragment() {
+
+  private lateinit var databinding: FragmentEpisodePlayerBinding
 
   private val podcastViewModel: PodcastViewModel by activityViewModels()
   private lateinit var mediaBrowser: MediaBrowserCompat
@@ -85,25 +94,25 @@ class EpisodePlayerFragment : Fragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    retainInstance = true
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      isVideo = podcastViewModel.activeEpisodeViewData?.isVideo ?: false
+    isVideo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      podcastViewModel.activeEpisodeViewData?.isVideo ?: false
     } else {
-      isVideo = false
+      false
     }
     if (!isVideo) {
       initMediaBrowser()
     }
   }
+
   override fun onCreateView(inflater: LayoutInflater,
                             container: ViewGroup?,
-                            savedInstanceState: Bundle?): View? {
-    return inflater.inflate(R.layout.fragment_episode_player,
-        container, false)
+                            savedInstanceState: Bundle?): View {
+    databinding = FragmentEpisodePlayerBinding.inflate(inflater, container, false)
+    return databinding.root
   }
 
-  override fun onActivityCreated(savedInstanceState: Bundle?) {
-    super.onActivityCreated(savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
     setupControls()
     if (isVideo) {
       initMediaSession()
@@ -147,39 +156,45 @@ class EpisodePlayerFragment : Fragment() {
   }
 
   private fun setupControls() {
-    playToggleButton.setOnClickListener {
+    databinding.playToggleButton.setOnClickListener {
       togglePlayPause()
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      speedButton.setOnClickListener {
+      databinding.speedButton.setOnClickListener {
         changeSpeed()
       }
     } else {
-      speedButton.visibility = View.INVISIBLE
+      databinding.speedButton.visibility = View.INVISIBLE
     }
-    forwardButton.setOnClickListener {
+    databinding.forwardButton.setOnClickListener {
       seekBy(30)
     }
-    replayButton.setOnClickListener {
+    databinding.replayButton.setOnClickListener {
       seekBy(-10)
     }
-
-    seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+    // 1
+    databinding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
       override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-        currentTimeTextView.text = DateUtils.formatElapsedTime((progress / 1000).toLong())
+        // 2
+        databinding.currentTimeTextView.text = DateUtils.formatElapsedTime((progress / 1000).toLong())
       }
 
       override fun onStartTrackingTouch(seekBar: SeekBar) {
+        // 3
         draggingScrubber = true
       }
 
       override fun onStopTrackingTouch(seekBar: SeekBar) {
+        // 4
         draggingScrubber = false
+        // 5
         val fragmentActivity = activity as FragmentActivity
         val controller = MediaControllerCompat.getMediaController(fragmentActivity)
         if (controller.playbackState != null) {
+          // 6
           controller.transportControls.seekTo(seekBar.progress.toLong())
         } else {
+          // 7
           seekBar.progress = 0
         }
       }
@@ -187,11 +202,11 @@ class EpisodePlayerFragment : Fragment() {
   }
 
   private fun setupVideoUI() {
-    episodeDescTextView.visibility = View.INVISIBLE
-    headerView.visibility = View.INVISIBLE
+    databinding.episodeDescTextView.visibility = View.INVISIBLE
+    databinding.headerView.visibility = View.INVISIBLE
     val activity = activity as AppCompatActivity
     activity.supportActionBar?.hide()
-    playerControls.setBackgroundColor(Color.argb(255/2, 0, 0, 0))
+    databinding.playerControls.setBackgroundColor(Color.argb(255 / 2, 0, 0, 0))
   }
 
   private fun updateControlsFromController() {
@@ -208,9 +223,9 @@ class EpisodePlayerFragment : Fragment() {
   }
 
   private fun initVideoPlayer() {
-    videoSurfaceView.visibility = View.VISIBLE
-    val surfaceHolder = videoSurfaceView.holder
-    surfaceHolder.addCallback(object: SurfaceHolder.Callback {
+    databinding.videoSurfaceView.visibility = View.VISIBLE
+    val surfaceHolder = databinding.videoSurfaceView.holder
+    surfaceHolder.addCallback(object : SurfaceHolder.Callback {
       override fun surfaceCreated(holder: SurfaceHolder) {
         initMediaPlayer()
         mediaPlayer?.setDisplay(holder)
@@ -226,22 +241,38 @@ class EpisodePlayerFragment : Fragment() {
 
   private fun initMediaPlayer() {
     if (mediaPlayer == null) {
+      // 1
       mediaPlayer = MediaPlayer()
-      mediaPlayer?.let {
-        it.setAudioStreamType(AudioManager.STREAM_MUSIC)
-        it.setDataSource(podcastViewModel.activeEpisodeViewData?.mediaUrl)
-        it.setOnPreparedListener {
+      mediaPlayer?.let { mediaPlayer ->
+        // 2
+        mediaPlayer.setAudioAttributes(
+            AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .build()
+        )
+        // 3
+        mediaPlayer.setDataSource(podcastViewModel.activeEpisodeViewData?.mediaUrl)
+        // 4
+        mediaPlayer.setOnPreparedListener {
+          // 5
           val fragmentActivity = activity as FragmentActivity
-          val episodeMediaCallback = PodplayMediaCallback(fragmentActivity, mediaSession!!, it)
-          mediaSession!!.setCallback(episodeMediaCallback)
+          mediaSession?.let { mediaSession ->
+            val episodeMediaCallback = PodplayMediaCallback(fragmentActivity, mediaSession, it)
+            mediaSession.setCallback(episodeMediaCallback)
+          }
+          // 6
           setSurfaceSize()
+          // 7
           if (playOnPrepare) {
             togglePlayPause()
           }
         }
-        it.prepareAsync()
+        // 8
+        mediaPlayer.prepareAsync()
       }
     } else {
+      // 9
       setSurfaceSize()
     }
   }
@@ -251,7 +282,10 @@ class EpisodePlayerFragment : Fragment() {
       mediaSession = MediaSessionCompat(activity as Context, "EpisodePlayerFragment")
       mediaSession?.setMediaButtonReceiver(null)
     }
-    registerMediaController(mediaSession!!.sessionToken)
+    mediaSession?.let {
+      registerMediaController(it.sessionToken)
+    }
+
   }
 
   private fun setSurfaceSize() {
@@ -261,14 +295,14 @@ class EpisodePlayerFragment : Fragment() {
     val videoWidth = mediaPlayer.videoWidth
     val videoHeight = mediaPlayer.videoHeight
 
-    val parent = videoSurfaceView.parent as View
+    val parent = databinding.videoSurfaceView.parent as View
     val containerWidth = parent.width
     val containerHeight = parent.height
 
     val layoutAspectRatio = containerWidth.toFloat() / containerHeight
     val videoAspectRatio = videoWidth.toFloat() / videoHeight
 
-    val layoutParams = videoSurfaceView.layoutParams
+    val layoutParams = databinding.videoSurfaceView.layoutParams
 
     if (videoAspectRatio > layoutAspectRatio) {
       layoutParams.height = (containerWidth / videoAspectRatio).toInt()
@@ -276,14 +310,14 @@ class EpisodePlayerFragment : Fragment() {
       layoutParams.width = (containerHeight * videoAspectRatio).toInt()
     }
 
-    videoSurfaceView.layoutParams = layoutParams
+    databinding.videoSurfaceView.layoutParams = layoutParams
   }
 
   private fun animateScrubber(progress: Int, speed: Float) {
 
     val timeRemaining = ((episodeDuration - progress) / speed).toInt()
     if (timeRemaining < 0) {
-      return;
+      return
     }
 
     progressAnimator = ValueAnimator.ofInt(
@@ -295,7 +329,7 @@ class EpisodePlayerFragment : Fragment() {
         if (draggingScrubber) {
           animator.cancel()
         } else {
-          seekBar.progress = animator.animatedValue as Int
+          databinding.seekBar.progress = animator.animatedValue as Int
         }
       }
       animator.start()
@@ -304,8 +338,8 @@ class EpisodePlayerFragment : Fragment() {
 
   private fun updateControlsFromMetadata(metadata: MediaMetadataCompat) {
     episodeDuration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)
-    endTimeTextView.text = DateUtils.formatElapsedTime((episodeDuration / 1000))
-    seekBar.max = episodeDuration.toInt()
+    databinding.endTimeTextView.text = DateUtils.formatElapsedTime((episodeDuration / 1000))
+    databinding.seekBar.max = episodeDuration.toInt()
   }
 
   private fun changeSpeed() {
@@ -321,14 +355,14 @@ class EpisodePlayerFragment : Fragment() {
     val fragmentActivity = activity as FragmentActivity
     val controller = MediaControllerCompat.getMediaController(fragmentActivity)
     controller.sendCommand(CMD_CHANGESPEED, bundle, null)
-
-    speedButton.text = "${playerSpeed}x"
+    val speedButtonText = "${playerSpeed}x"
+    databinding.speedButton.text = speedButtonText
   }
 
   private fun seekBy(seconds: Int) {
     val fragmentActivity = activity as FragmentActivity
     val controller = MediaControllerCompat.getMediaController(fragmentActivity)
-    val newPosition = controller.playbackState.position + seconds*1000
+    val newPosition = controller.playbackState.position + seconds * 1000
     controller.transportControls.seekTo(newPosition)
   }
 
@@ -338,11 +372,12 @@ class EpisodePlayerFragment : Fragment() {
       progressAnimator = null
     }
     val isPlaying = state == PlaybackStateCompat.STATE_PLAYING
-    playToggleButton.isActivated = isPlaying
+    databinding.playToggleButton.isActivated = isPlaying
 
     val progress = position.toInt()
-    seekBar.progress = progress
-    speedButton.text = "${playerSpeed}x"
+    databinding.seekBar.progress = progress
+    val speedButtonText = "${playerSpeed}x"
+    databinding.speedButton.text = speedButtonText
 
     if (isPlaying) {
       if (isVideo) {
@@ -353,20 +388,22 @@ class EpisodePlayerFragment : Fragment() {
   }
 
   private fun updateControls() {
-    episodeTitleTextView.text = podcastViewModel.activeEpisodeViewData?.title
-
+    // 1
+    databinding.episodeTitleTextView.text = podcastViewModel.activeEpisodeViewData?.title
+    // 2
     val htmlDesc = podcastViewModel.activeEpisodeViewData?.description ?: ""
     val descSpan = HtmlUtils.htmlToSpannable(htmlDesc)
-    episodeDescTextView.text = descSpan
-    episodeDescTextView.movementMethod = ScrollingMovementMethod()
-
+    databinding.episodeDescTextView.text = descSpan
+    databinding.episodeDescTextView.movementMethod = ScrollingMovementMethod()
+    // 3
     val fragmentActivity = activity as FragmentActivity
     Glide.with(fragmentActivity)
-        .load(podcastViewModel.activePodcastViewData?.imageUrl)
-        .into(episodeImageView)
+        .load(podcastViewModel.podcastLiveData.value?.imageUrl)
+        .into(databinding.episodeImageView)
 
-    speedButton.text = "${playerSpeed}x"
-    
+    val speedButtonText = "${playerSpeed}x"
+    databinding.speedButton.text = speedButtonText
+
     mediaPlayer?.let {
       updateControlsFromController()
     }
@@ -376,16 +413,16 @@ class EpisodePlayerFragment : Fragment() {
     val fragmentActivity = activity as FragmentActivity
     val controller = MediaControllerCompat.getMediaController(fragmentActivity)
 
-    val viewData = podcastViewModel.activePodcastViewData ?: return
+    val viewData = podcastViewModel.podcastLiveData
     val bundle = Bundle()
 
     bundle.putString(MediaMetadataCompat.METADATA_KEY_TITLE, episodeViewData.title)
-    bundle.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, viewData.feedTitle)
-    bundle.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, viewData.imageUrl)
+    bundle.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, viewData.value?.feedTitle)
+    bundle.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, viewData.value?.imageUrl)
 
     controller.transportControls.playFromUri(Uri.parse(episodeViewData.mediaUrl), bundle)
   }
-  
+
   private fun togglePlayPause() {
     playOnPrepare = true
     val fragmentActivity = activity as FragmentActivity
@@ -417,7 +454,7 @@ class EpisodePlayerFragment : Fragment() {
         null)
   }
 
-  inner class MediaBrowserCallBacks: MediaBrowserCompat.ConnectionCallback() {
+  inner class MediaBrowserCallBacks : MediaBrowserCompat.ConnectionCallback() {
 
     override fun onConnected() {
       super.onConnected()
@@ -436,7 +473,7 @@ class EpisodePlayerFragment : Fragment() {
     }
   }
 
-  inner class MediaControllerCallback: MediaControllerCompat.Callback() {
+  inner class MediaControllerCallback : MediaControllerCompat.Callback() {
 
     override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
       super.onMetadataChanged(metadata)
@@ -444,8 +481,9 @@ class EpisodePlayerFragment : Fragment() {
     }
 
     override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-      val state = state ?: return
-      handleStateChange(state.state, state.position, state.playbackSpeed)
+      val currentState = state ?: return
+      handleStateChange(currentState.state, currentState.position, currentState.playbackSpeed)
     }
   }
+
 }

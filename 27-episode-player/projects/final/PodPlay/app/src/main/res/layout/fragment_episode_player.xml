@@ -1,3 +1,37 @@
+<!--
+  ~ Copyright (c) 2021 Razeware LLC
+  ~
+  ~  Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~   of this software and associated documentation files (the "Software"), to deal
+  ~   in the Software without restriction, including without limitation the rights
+  ~   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~   copies of the Software, and to permit persons to whom the Software is
+  ~   furnished to do so, subject to the following conditions:
+  ~
+  ~  The above copyright notice and this permission notice shall be included in
+  ~  all copies or substantial portions of the Software.
+  ~
+  ~   Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
+  ~   distribute, sublicense, create a derivative work, and/or sell copies of the
+  ~   Software in any work that is designed, intended, or marketed for pedagogical or
+  ~   instructional purposes related to programming, coding, application development,
+  ~   or information technology.  Permission for such use, copying, modification,
+  ~   merger, publication, distribution, sublicensing, creation of derivative works,
+  ~   or sale is expressly withheld.
+  ~
+  ~   This project and source code may use libraries or frameworks that are
+  ~   released under various Open-Source licenses. Use of those libraries and
+  ~   frameworks are governed by their own individual licenses.
+  ~
+  ~   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~   THE SOFTWARE.
+  -->
+
 <androidx.constraintlayout.widget.ConstraintLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -5,7 +39,7 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:background="@android:color/black"
-  tools:context="com.raywenderlich.podplay.ui.EpisodePlayerFragment">
+  >
 
   <SurfaceView
       android:id="@+id/videoSurfaceView"
@@ -34,7 +68,8 @@
       android:layout_marginTop="8dp"
       android:src="@android:drawable/ic_menu_report_image"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"/>
+      app:layout_constraintTop_toTopOf="parent"
+      android:contentDescription="@string/episode_thumbnail" />
 
     <TextView
         android:id="@+id/episodeTitleTextView"
@@ -82,7 +117,8 @@
         android:scaleType="fitCenter"
         android:src="@drawable/ic_replay_10_white"
         app:layout_constraintEnd_toStartOf="@+id/playToggleButton"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+      android:contentDescription="@string/replay_button" />
 
     <Button
         android:id="@+id/playToggleButton"
@@ -106,21 +142,22 @@
         android:scaleType="fitCenter"
         android:src="@drawable/ic_forward_30_white"
         app:layout_constraintStart_toEndOf="@+id/playToggleButton"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+      android:contentDescription="@string/skip_forward" />
 
     <Button
-        android:id="@+id/speedButton"
-        android:layout_width="54dp"
-        android:layout_height="34dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/transparent"
-        android:text="1x"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+      android:id="@+id/speedButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="8dp"
+      android:layout_marginTop="5dp"
+      android:background="@android:color/transparent"
+      android:text="@string/_1x"
+      android:textAllCaps="false"
+      android:textColor="@android:color/white"
+      android:textSize="14sp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/currentTimeTextView"
@@ -128,7 +165,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
-        android:text="0:00"
+        android:text="@string/_0_00"
         android:textColor="@android:color/white"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -148,18 +185,16 @@
         app:layout_constraintStart_toEndOf="@+id/currentTimeTextView"/>
 
     <TextView
-        android:id="@+id/endTimeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="0:00"
-        android:textColor="@android:color/white"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/seekBar"/>
-
+      android:id="@+id/endTimeTextView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="8dp"
+      android:layout_marginEnd="8dp"
+      android:text="@string/_0_00"
+      android:textColor="@android:color/white"
+      android:textSize="12sp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="@+id/seekBar" />
   </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
