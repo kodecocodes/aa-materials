@@ -36,6 +36,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.raywenderlich.podplay.R
 import com.raywenderlich.podplay.repository.ItunesRepo
 import com.raywenderlich.podplay.service.ItunesService
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class PodcastActivity : AppCompatActivity() {
 
@@ -49,8 +51,9 @@ class PodcastActivity : AppCompatActivity() {
 
     val itunesRepo = ItunesRepo(itunesService)
 
-    itunesRepo.searchByTerm("Android Developer") {
-      Log.i(TAG, "Results = $it")
+    GlobalScope.launch {
+      val results = itunesRepo.searchByTerm("Android Developer")
+      Log.i(TAG, "Results = ${results.body()}")
     }
   }
 }
