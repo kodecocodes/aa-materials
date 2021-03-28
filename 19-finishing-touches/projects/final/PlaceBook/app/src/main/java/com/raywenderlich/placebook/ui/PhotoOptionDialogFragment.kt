@@ -47,16 +47,11 @@ class PhotoOptionDialogFragment : DialogFragment() {
 
   private lateinit var listener: PhotoOptionDialogListener
 
-  override fun onCreateDialog(savedInstanceState: Bundle?):
-      Dialog {
-
+  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     listener = activity as PhotoOptionDialogListener
-
     var captureSelectIdx = -1
     var pickSelectIdx = -1
-
     val options = ArrayList<String>()
-
     val context = activity as Context
 
     if (canCapture(context)) {
@@ -69,45 +64,31 @@ class PhotoOptionDialogFragment : DialogFragment() {
       pickSelectIdx = if (captureSelectIdx == 0) 1 else 0
     }
 
-    return AlertDialog.Builder(context)
-        .setTitle("Photo Option")
-        .setItems(options.toTypedArray<CharSequence>()) {
-          _, which ->
+    return AlertDialog.Builder(context).setTitle("Photo Option").setItems(options.toTypedArray<CharSequence>()) { _, which ->
           if (which == captureSelectIdx) {
-
             listener.onCaptureClick()
           } else if (which == pickSelectIdx) {
-
             listener.onPickClick()
           }
-        }
-        .setNegativeButton("Cancel", null)
-        .create()
+        }.setNegativeButton("Cancel", null).create()
   }
+
   companion object {
-
-    fun canPick(context: Context) : Boolean {
-      val pickIntent = Intent(Intent.ACTION_PICK,
-          MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-      return (pickIntent.resolveActivity(
-          context.packageManager) != null)
+    fun canPick(context: Context): Boolean {
+      val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+      return (pickIntent.resolveActivity(context.packageManager) != null)
     }
 
-    fun canCapture(context: Context) : Boolean {
-      val captureIntent = Intent(
-          MediaStore.ACTION_IMAGE_CAPTURE)
-      return (captureIntent.resolveActivity(
-          context.packageManager) != null)
+    fun canCapture(context: Context): Boolean {
+      val captureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+      return (captureIntent.resolveActivity(context.packageManager) != null)
     }
 
-    fun newInstance(context: Context):
-        PhotoOptionDialogFragment? {
-
-      if (canPick(context) || canCapture(context)) {
-        val frag = PhotoOptionDialogFragment()
-        return frag
+    fun newInstance(context: Context): PhotoOptionDialogFragment? {
+      return if (canPick(context) || canCapture(context)) {
+        PhotoOptionDialogFragment()
       } else {
-        return null
+        null
       }
     }
   }

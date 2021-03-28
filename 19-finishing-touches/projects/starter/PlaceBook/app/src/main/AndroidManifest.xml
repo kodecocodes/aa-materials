@@ -39,8 +39,7 @@
     </activity>
 
     <activity
-        android:name=
-            "com.raywenderlich.placebook.ui.BookmarkDetailsActivity"
+        android:name="com.raywenderlich.placebook.ui.BookmarkDetailsActivity"
         android:label="Bookmark"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden">
@@ -57,5 +56,14 @@
     </provider>
 
   </application>
+  <queries>
+    <intent>
+      <action android:name="android.media.action.IMAGE_CAPTURE" />
+    </intent>
+    <intent>
+      <action android:name="android.intent.action.PICK" />
+      <data android:mimeType="image/*" />
+    </intent>
+  </queries>
 
 </manifest>
