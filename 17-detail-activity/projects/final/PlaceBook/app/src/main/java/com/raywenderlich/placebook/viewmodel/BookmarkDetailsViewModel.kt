@@ -32,7 +32,6 @@ package com.raywenderlich.placebook.viewmodel
 
 import android.app.Application
 import android.content.Context
-import android.graphics.Bitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
@@ -42,11 +41,9 @@ import com.raywenderlich.placebook.util.ImageUtils
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class BookmarkDetailsViewModel(application: Application) :
-    AndroidViewModel(application) {
+class BookmarkDetailsViewModel(application: Application) : AndroidViewModel(application) {
 
-  private var bookmarkRepo: BookmarkRepo =
-      BookmarkRepo(getApplication())
+  private val bookmarkRepo: BookmarkRepo = BookmarkRepo(getApplication())
   private var bookmarkDetailsView: LiveData<BookmarkDetailsView>? = null
 
   fun getBookmark(bookmarkId: Long): LiveData<BookmarkDetailsView>? {
@@ -57,15 +54,13 @@ class BookmarkDetailsViewModel(application: Application) :
   }
 
   fun updateBookmark(bookmarkDetailsView: BookmarkDetailsView) {
-
     GlobalScope.launch {
       val bookmark = bookmarkViewToBookmark(bookmarkDetailsView)
       bookmark?.let { bookmarkRepo.updateBookmark(it) }
     }
   }
 
-  private fun bookmarkViewToBookmark(bookmarkDetailsView: BookmarkDetailsView):
-      Bookmark? {
+  private fun bookmarkViewToBookmark(bookmarkDetailsView: BookmarkDetailsView): Bookmark? {
     val bookmark = bookmarkDetailsView.id?.let {
       bookmarkRepo.getBookmark(it)
     }
@@ -103,12 +98,8 @@ class BookmarkDetailsViewModel(application: Application) :
       var address: String = "",
       var notes: String = ""
   ) {
-    fun getImage(context: Context): Bitmap? {
-      id?.let {
-        return ImageUtils.loadBitmapFromFile(context,
-            Bookmark.generateImageFilename(it))
-      }
-      return null
+    fun getImage(context: Context) = id?.let {
+      ImageUtils.loadBitmapFromFile(context, Bookmark.generateImageFilename(it))
     }
   }
 
