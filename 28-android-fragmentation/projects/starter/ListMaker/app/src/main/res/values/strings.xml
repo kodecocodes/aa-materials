@@ -1,13 +1,7 @@
 <resources>
     <string name="app_name">Listmaker</string>
-    <string name="action_settings">Settings</string>
     <string name="name_of_list">What is the name of your list?</string>
     <string name="create_list">Create</string>
     <string name="task_to_add">What is the task you want to add?</string>
     <string name="add_task">Add</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <string name="list_fragment_tag">List Fragment</string>
 </resources>
