@@ -45,7 +45,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
       var lastUpdated: String? = "",
       var imageUrl: String? = "",
       var feedUrl: String? = "")
-  
+
   private fun itunesPodcastToPodcastSummaryView(
       itunesPodcast: PodcastResponse.ItunesPodcast):
       PodcastSummaryViewData {
@@ -56,16 +56,17 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         itunesPodcast.feedUrl)
   }
 
-  fun searchPodcasts(term: String, callback: (List<PodcastSummaryViewData>) -> Unit) {
-    iTunesRepo?.searchByTerm(term) { results ->
-      if (results == null) {
-        callback(emptyList())
-      } else {
-        val searchViews = results.map { podcast ->
+  suspend fun searchPodcasts(term: String): List<PodcastSummaryViewData> {
+    val results = iTunesRepo?.searchByTerm(term)
+
+    if (results != null && results.isSuccessful) {
+      val podcasts = results.body()?.results
+      if (!podcasts.isNullOrEmpty()) {
+        return podcasts.map { podcast ->
           itunesPodcastToPodcastSummaryView(podcast)
         }
-        callback(searchViews)
       }
     }
+    return emptyList()
   }
 }
