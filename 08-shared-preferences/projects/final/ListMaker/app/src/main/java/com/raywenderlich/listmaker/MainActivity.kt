@@ -1,81 +1,68 @@
 package com.raywenderlich.listmaker
 
+import android.content.SharedPreferences
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
-import android.view.Menu
-import android.view.MenuItem
+import android.util.Log
+import android.view.LayoutInflater
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_main.*
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStore
+import androidx.preference.PreferenceManager
+import com.raywenderlich.listmaker.databinding.MainActivityBinding
+import com.raywenderlich.listmaker.databinding.MainFragmentBinding
+import com.raywenderlich.listmaker.models.TaskList
+import com.raywenderlich.listmaker.ui.main.MainFragment
+import com.raywenderlich.listmaker.ui.main.MainViewModel
+import com.raywenderlich.listmaker.ui.main.MainViewModelFactory
 
 class MainActivity : AppCompatActivity() {
 
-  val listDataManager: ListDataManager = ListDataManager(this)
+    private lateinit var binding: MainActivityBinding
 
-  lateinit var listsRecyclerView: RecyclerView
+    private lateinit var viewModel: MainViewModel
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
-    setSupportActionBar(toolbar)
+        viewModel = ViewModelProvider(this,
+            MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(this)))
+            .get(MainViewModel::class.java)
 
-    fab.setOnClickListener {
-      showCreateListDialog()
+        binding = MainActivityBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+        Log.i("MainActivity", viewModel.toString())
+
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.container, MainFragment.newInstance())
+                    .commitNow()
+        }
+        
+        binding.fabButton.setOnClickListener {
+            showCreateListDialog()
+        }
     }
 
-    // 1
-    val lists = listDataManager.readLists()
-    listsRecyclerView = findViewById(R.id.lists_recyclerview)
-    listsRecyclerView.layoutManager = LinearLayoutManager(this)
+    private fun showCreateListDialog() {
 
-    // 2
-    listsRecyclerView.adapter = ListSelectionRecyclerViewAdapter(lists)
-  }
+        val dialogTitle = getString(R.string.name_of_list)
+        val positiveButtonTitle = getString(R.string.create_list)
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    menuInflater.inflate(R.menu.menu_main, menu)
-    return true
-  }
+        val builder = AlertDialog.Builder(this)
+        val listTitleEditText = EditText(this)
+        listTitleEditText.inputType = InputType.TYPE_CLASS_TEXT
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
-    return when (item.itemId) {
-      R.id.action_settings -> true
-      else -> super.onOptionsItemSelected(item)
+        builder.setTitle(dialogTitle)
+        builder.setView(listTitleEditText)
+        builder.setPositiveButton(positiveButtonTitle) { dialog, _ ->
+            dialog.dismiss()
+            viewModel.saveList(TaskList(listTitleEditText.text.toString()))
+        }
+
+        builder.create().show()
     }
-  }
-
-  private fun showCreateListDialog() {
-    // 1
-    val dialogTitle = getString(R.string.name_of_list)
-    val positiveButtonTitle = getString(R.string.create_list)
-
-    // 2
-    val builder = AlertDialog.Builder(this)
-    val listTitleEditText = EditText(this)
-    listTitleEditText.inputType = InputType.TYPE_CLASS_TEXT
-
-    builder.setTitle(dialogTitle)
-    builder.setView(listTitleEditText)
-
-    // 3
-    builder.setPositiveButton(positiveButtonTitle) { dialog, _ ->
-      val list = TaskList(listTitleEditText.text.toString())
-      listDataManager.saveList(list)
-
-      val recyclerAdapter = listsRecyclerView.adapter as ListSelectionRecyclerViewAdapter
-      recyclerAdapter.addList(list)
-
-      dialog.dismiss()
-    }
-
-    // 4
-    builder.create().show()
-  }
 }
