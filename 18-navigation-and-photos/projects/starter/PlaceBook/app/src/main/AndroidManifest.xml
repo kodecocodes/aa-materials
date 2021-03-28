@@ -38,8 +38,7 @@
     </activity>
 
     <activity
-        android:name=
-            "com.raywenderlich.placebook.ui.BookmarkDetailsActivity"
+        android:name="com.raywenderlich.placebook.ui.BookmarkDetailsActivity"
         android:label="Bookmark"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden">
