@@ -8,17 +8,8 @@ class MainViewModel(private val sharedPreferences: SharedPreferences) : ViewMode
 
   lateinit var onListAdded: (() -> Unit)
 
-  lateinit var onTaskAdded: (() -> Unit)
-
-  lateinit var list: TaskList
-
   val lists: MutableList<TaskList> by lazy {
     retrieveLists()
-  }
-
-  fun addTask(task: String) {
-    list.tasks.add(task)
-    updateList(list)
   }
 
   private fun retrieveLists(): MutableList<TaskList> {
@@ -43,6 +34,7 @@ class MainViewModel(private val sharedPreferences: SharedPreferences) : ViewMode
 
   fun updateList(list: TaskList) {
     sharedPreferences.edit().putStringSet(list.name, list.tasks.toHashSet()).apply()
+    lists.add(list)
   }
 
   fun refreshLists() {
