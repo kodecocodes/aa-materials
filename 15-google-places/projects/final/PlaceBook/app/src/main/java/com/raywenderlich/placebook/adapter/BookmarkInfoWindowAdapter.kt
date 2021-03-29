@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Razeware LLC
+ * Copyright (c) 2021 Razeware LLC
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,20 +33,13 @@ package com.raywenderlich.placebook.adapter
 import android.app.Activity
 import android.graphics.Bitmap
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
-import com.raywenderlich.placebook.R
+import com.raywenderlich.placebook.databinding.ContentBookmarkInfoBinding
 
 class BookmarkInfoWindowAdapter(context: Activity) :
     GoogleMap.InfoWindowAdapter {
-  private val contents: View
-
-  init {
-    contents = context.layoutInflater.inflate(
-        R.layout.content_bookmark_info, null)
-  }
+  private val binding = ContentBookmarkInfoBinding.inflate(context.layoutInflater)
 
   override fun getInfoWindow(marker: Marker): View? {
     // This function is required, but can return null if
@@ -55,15 +48,10 @@ class BookmarkInfoWindowAdapter(context: Activity) :
   }
 
   override fun getInfoContents(marker: Marker): View? {
-    val titleView = contents.findViewById<TextView>(R.id.title)
-    titleView.text = marker.title ?: ""
-
-    val phoneView = contents.findViewById<TextView>(R.id.phone)
-    phoneView.text = marker.snippet ?: ""
-
-    val imageView = contents.findViewById<ImageView>(R.id.photo)
-    imageView.setImageBitmap(marker.tag as Bitmap?)
-
-    return contents
+    binding.title.text = marker.title ?: ""
+    binding.phone.text = marker.snippet ?: ""
+    val imageView = binding.photo
+    imageView.setImageBitmap((marker.tag as Bitmap))
+    return binding.root
   }
 }

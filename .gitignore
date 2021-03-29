@@ -211,6 +211,7 @@ captures/
 
 # IntelliJ
 *.iml
+*.idea*
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/gradle.xml
@@ -287,4 +288,3 @@ DerivedData/
 
 ## Gcc Patch
 /*.gcno
-03-activities/projects/starter/timefighter/.idea

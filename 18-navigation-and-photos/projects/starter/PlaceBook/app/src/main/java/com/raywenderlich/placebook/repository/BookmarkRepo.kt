@@ -59,10 +59,8 @@ class BookmarkRepo(private val context: Context) {
     return Bookmark()
   }
 
-  fun getLiveBookmark(bookmarkId: Long): LiveData<Bookmark> {
-    val bookmark = bookmarkDao.loadLiveBookmark(bookmarkId)
-    return bookmark
-  }
+  fun getLiveBookmark(bookmarkId: Long): LiveData<Bookmark> =
+          bookmarkDao.loadLiveBookmark(bookmarkId)
 
   val allBookmarks: LiveData<List<Bookmark>>
     get() {
