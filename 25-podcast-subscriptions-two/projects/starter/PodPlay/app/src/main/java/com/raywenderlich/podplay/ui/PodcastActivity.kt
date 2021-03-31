@@ -44,6 +44,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.raywenderlich.podplay.R
@@ -124,9 +125,11 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
   override fun onShowDetails(podcastSummaryViewData: SearchViewModel.PodcastSummaryViewData) {
     podcastSummaryViewData.feedUrl ?: return
     showProgressBar()
-    podcastViewModel.getPodcast(podcastSummaryViewData)
-    hideProgressBar()
-    showDetailsFragment()
+    podcastViewModel.viewModelScope.launch (context = Dispatchers.Main) {
+      podcastViewModel.getPodcast(podcastSummaryViewData)
+      hideProgressBar()
+      showDetailsFragment()
+    }
   }
 
   private fun showSubscribedPodcasts() {
