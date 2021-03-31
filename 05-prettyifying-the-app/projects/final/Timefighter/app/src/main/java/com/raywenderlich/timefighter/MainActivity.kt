@@ -1,5 +1,6 @@
 package com.raywenderlich.timefighter
 
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -10,7 +11,6 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,10 +42,8 @@ class MainActivity : AppCompatActivity() {
     tapMeButton = findViewById(R.id.tap_me_button)
     // 2
     tapMeButton.setOnClickListener { v ->
-      val bounceAnimation = AnimationUtils.loadAnimation(
-        this,
-        R.anim.bounce
-      )
+      val bounceAnimation = AnimationUtils.loadAnimation(this,
+              R.anim.bounce)
       v.startAnimation(bounceAnimation)
       incrementScore()
     }
@@ -57,6 +55,32 @@ class MainActivity : AppCompatActivity() {
     } else {
       resetGame()
     }
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    // Inflate the menu; this adds items to the action bar if it is present.
+    super.onCreateOptionsMenu(menu)
+    menuInflater.inflate(R.menu.menu, menu)
+    return true
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    if (item.itemId == R.id.about_item) {
+      showInfo()
+    }
+
+    return true
+  }
+
+  private fun showInfo() {
+    val dialogTitle = getString(R.string.about_title,
+            BuildConfig.VERSION_NAME)
+    val dialogMessage = getString(R.string.about_message)
+
+    val builder = AlertDialog.Builder(this)
+    builder.setTitle(dialogTitle)
+    builder.setMessage(dialogMessage)
+    builder.create().show()
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -76,34 +100,6 @@ class MainActivity : AppCompatActivity() {
     Log.d(TAG, "onDestroy called.")
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    super.onCreateOptionsMenu(menu)
-    menuInflater.inflate(R.menu.menu, menu)
-    return true
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == R.id.about_item) {
-      showInfo()
-    }
-
-    return true
-  }
-
-  private fun showInfo() {
-    val dialogTitle = getString(
-      R.string.about_title,
-      BuildConfig.VERSION_NAME
-    )
-    val dialogMessage = getString(R.string.about_message)
-
-    val builder = AlertDialog.Builder(this)
-    builder.setTitle(dialogTitle)
-    builder.setMessage(dialogMessage)
-    builder.create().show()
-  }
-
   private fun incrementScore() {
 
     if (!gameStarted) {
@@ -112,7 +108,7 @@ class MainActivity : AppCompatActivity() {
 
     score++
 
-    val newScore = "Your Score: $score"
+    val newScore = getString(R.string.your_score, score)
     gameScoreTextView.text = newScore
   }
 
