@@ -7,7 +7,7 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
-    defaultConfig {
+     defaultConfig {
         applicationId "com.raywenderlich.listmaker"
         minSdkVersion 22
         targetSdkVersion 30
@@ -30,7 +30,6 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-
     buildFeatures {
         viewBinding true
     }
