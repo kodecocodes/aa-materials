@@ -41,10 +41,10 @@ class MainActivity : AppCompatActivity() {
     timeLeftTextView = findViewById(R.id.time_left_text_view)
     tapMeButton = findViewById(R.id.tap_me_button)
     // 2
-    tapMeButton.setOnClickListener { v ->
+    tapMeButton.setOnClickListener { view ->
       val bounceAnimation = AnimationUtils.loadAnimation(this,
-              R.anim.bounce)
-      v.startAnimation(bounceAnimation)
+        R.anim.bounce)
+      view.startAnimation(bounceAnimation)
       incrementScore()
     }
 
@@ -55,6 +55,17 @@ class MainActivity : AppCompatActivity() {
     } else {
       resetGame()
     }
+  }
+
+  override fun onSaveInstanceState(outState: Bundle) {
+
+    super.onSaveInstanceState(outState)
+
+    outState.putInt(SCORE_KEY, score)
+    outState.putInt(TIME_LEFT_KEY, timeLeft)
+    countDownTimer.cancel()
+
+    Log.d(TAG, "onSaveInstanceState: Saving Score: $score & Time Left: $timeLeft")
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -72,32 +83,21 @@ class MainActivity : AppCompatActivity() {
     return true
   }
 
+  override fun onDestroy() {
+    super.onDestroy()
+
+    Log.d(TAG, "onDestroy called.")
+  }
+
   private fun showInfo() {
     val dialogTitle = getString(R.string.about_title,
-            BuildConfig.VERSION_NAME)
+      BuildConfig.VERSION_NAME)
     val dialogMessage = getString(R.string.about_message)
 
     val builder = AlertDialog.Builder(this)
     builder.setTitle(dialogTitle)
     builder.setMessage(dialogMessage)
     builder.create().show()
-  }
-
-  override fun onSaveInstanceState(outState: Bundle) {
-
-    super.onSaveInstanceState(outState)
-
-    outState.putInt(SCORE_KEY, score)
-    outState.putInt(TIME_LEFT_KEY, timeLeft)
-    countDownTimer.cancel()
-
-    Log.d(TAG, "onSaveInstanceState: Saving Score: $score & Time Left: $timeLeft")
-  }
-
-  override fun onDestroy() {
-    super.onDestroy()
-
-    Log.d(TAG, "onDestroy called.")
   }
 
   private fun incrementScore() {
