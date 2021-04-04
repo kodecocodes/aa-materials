@@ -122,9 +122,9 @@ class PodplayMediaService : MediaBrowserServiceCompat(), PodplayMediaListener {
   }
 
   private fun isPlaying() =
-      mediaSession.controller.playbackState != null &&
-          mediaSession.controller.playbackState.state ==
-          PlaybackStateCompat.STATE_PLAYING
+    mediaSession.controller.playbackState != null &&
+      mediaSession.controller.playbackState.state ==
+        PlaybackStateCompat.STATE_PLAYING
 
   private fun getNotificationIntent(): PendingIntent {
     val openActivityIntent = Intent(this, PodcastActivity::class.java)

@@ -56,6 +56,7 @@ class EpisodeListAdapter(
       databinding: EpisodeItemBinding,
       val episodeListAdapterListener: EpisodeListAdapterListener
   ) : RecyclerView.ViewHolder(databinding.root) {
+
     init {
       databinding.root.setOnClickListener {
         episodeViewData?.let {
