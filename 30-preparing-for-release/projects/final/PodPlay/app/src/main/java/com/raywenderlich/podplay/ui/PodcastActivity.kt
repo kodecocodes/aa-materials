@@ -130,9 +130,11 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapterListener,
   override fun onShowDetails(podcastSummaryViewData: SearchViewModel.PodcastSummaryViewData) {
     podcastSummaryViewData.feedUrl ?: return
     showProgressBar()
-    podcastViewModel.getPodcast(podcastSummaryViewData)
-    hideProgressBar()
-    showDetailsFragment()
+    podcastViewModel.viewModelScope.launch (context = Dispatchers.Main) {
+      podcastViewModel.getPodcast(podcastSummaryViewData)
+      hideProgressBar()
+      showDetailsFragment()
+    }
   }
 
   private fun scheduleJobs() {
