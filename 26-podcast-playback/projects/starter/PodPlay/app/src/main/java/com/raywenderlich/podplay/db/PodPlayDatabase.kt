@@ -36,11 +36,9 @@ package com.raywenderlich.podplay.db
 
 import android.content.Context
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.raywenderlich.podplay.model.Episode
 import com.raywenderlich.podplay.model.Podcast
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.util.*
 
 class Converters {
@@ -62,20 +60,6 @@ abstract class PodPlayDatabase : RoomDatabase() {
   // 2
   abstract fun podcastDao(): PodcastDao
 
-  private class PodPlayDatabaseCallback(
-      private val scope: CoroutineScope
-  ) : RoomDatabase.Callback() {
-
-    override fun onCreate(db: SupportSQLiteDatabase) {
-      super.onCreate(db)
-      INSTANCE?.let {
-        scope.launch {
-        }
-      }
-    }
-
-  }
-
   // 3
   companion object {
 
@@ -95,7 +79,6 @@ abstract class PodPlayDatabase : RoomDatabase() {
         val instance = Room.databaseBuilder(context.applicationContext,
             PodPlayDatabase::class.java,
             "PodPlayer")
-            .addCallback(PodPlayDatabaseCallback(coroutineScope))
             .build()
         INSTANCE = instance
         // 7
